@@ -13,12 +13,12 @@ Based on the Torchlight Impost/Export script by 'Dusho'
 Also thanks to'goatman' for his port of Ogre export script from 2.49b to 2.5x,
 and 'CCCenturion' for trying to refactor the code to be nicer (to be included)
 
-last edited by Kindrad Oct-29-2021
+last edited by Kindrad 2021/10/19
 
 """
 
 __author__ = "someone, Kindrad"
-__version__ = "2.9.1 29-Oct-2021"
+__version__ = "2021/10/19"
 
 __bpydoc__ = """\
 This script imports/exports Kenshi Ogre models into/from Blender.
