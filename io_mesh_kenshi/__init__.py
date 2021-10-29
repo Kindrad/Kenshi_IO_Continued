@@ -91,12 +91,12 @@ History:<br>
 """
 
 bl_info = {
-    "name": "Kenshi Tools",
-    "author": "someone",
-    "blender": (2, 80, 0),
-    "version": (0, 9, 1),
+    "name": "Kenshi Tools (Continued)",
+    "author": "someone, Kindrad",
+    "blender": (2, 90, 0),
+    "version": (29, 10, 2021),
     "location": "File > Import-Export",
-    "description": ("Import-Export Kenshi Model files, and export Kenshi collision files."),
+    "description": ("Import-Export Kenshi Model files, and export Kenshi collision files. (This is continued version by Kindrad)"),
     "warning": "",
     "wiki_url": "",
     "tracker_url": "http://lofigames.com/phpBB3/",
