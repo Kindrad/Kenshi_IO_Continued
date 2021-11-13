@@ -216,7 +216,9 @@ class Skeleton(object):
 
             if bone == None:
                 continue
-
+            
+            if bone.name.startswith("H_"):
+                continue
 
             print(i, bone)
         
@@ -320,18 +322,28 @@ def collectAnimationData(armature, frame_range, fps, step=1):
         poseBone.scale = Vector((1,1,1))
         poseBone.location = poseBone.bone.head
         
-    
+    bpy.ops.object.mode_set(mode='OBJECT', toggle=False)
+
+    obj = bpy.ops.context.object
 
     # Collect data
+    #this steps through each frame and exports the location, rotation, and scale data
     for frame in range( int(start), int(end)+1, step):
         time = (frame - start) / fps
         bpy.context.scene.frame_set(frame)
         for bone in armature.pose.bones:
+            
             if bone.name.startswith("H_"):
                 continue
-            loc = bone.location
-            rot = bone.rotation_quaternion.normalized()
-            scl = bone.scale
+
+            pbMatrix = armature.convert_space(pose_bone = bone,
+                matrix = bone.matrix,
+                from_space='POSE',
+                to_space ='LOCAL')
+            loc, rot, scl = pbMatrix.decompose()
+
+            #invert x because IDK
+            scl[0] = -scl[0]
             
             # transform transation into parent coordinates
             loc = mat[bone.name] @ loc
@@ -339,24 +351,25 @@ def collectAnimationData(armature, frame_range, fps, step=1):
             keyframes[bone.name][0].append((time, (loc[0], loc[1], loc[2])))
             keyframes[bone.name][1].append((time, (rot[0], rot[1], rot[2], rot[3])))
             keyframes[bone.name][2].append((time, (scl[0], scl[1], scl[2])))
+    
 
     # Remove unnessesary tracks
-    identity = [ (0,0,0), (1,0,0,0), (1,1,1) ]
-    for bone, data in keyframes.items():
-        for track in range(3):
-            used = False
-            for key in data[track]:
-                if used: break
-                for i in range(len(identity[track])):
-                    if abs(key[1][i] - identity[track][i]) > 1e-5:
-                        used = True
-                        break
-            if not used:
-                data[track] = []
+    # identity = [ (0,0,0), (1,0,0,0), (1,1,1) ]
+    # for bone, data in keyframes.items():
+    #     for track in range(3):
+    #         used = False
+    #         for key in data[track]:
+    #             if used: break
+    #             for i in range(len(identity[track])):
+    #                 if abs(key[1][i] - identity[track][i]) > 1e-5:
+    #                     used = True
+    #                     break
+    #         if not used:
+    #             data[track] = []
 
-        # Delete whole track if unused
-        if not (data[0] or data[1] or data[2]):
-            keyframes[bone] = None
+    #     # Delete whole track if unused
+    #     if not (data[0] or data[1] or data[2]):
+    #         keyframes[bone] = None
 
     return keyframes
 
