@@ -3,6 +3,7 @@ A continuation of the Kenshi IO plugin. Has some bugs fixes and new features...
 
 
 ### New Features:
++ Works on latest Blender 2.9+
 + Adding "H_" to the name of a bone prevents it from being exported, use this if you want helper bones (ie: IK targets) in the skeleton.
 + Added a Batch export option. When exporting multiple meshes you can optionally batch export them, they will be named according to the object name in Blender.
 
