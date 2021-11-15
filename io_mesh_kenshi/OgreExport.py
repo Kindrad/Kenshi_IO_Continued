@@ -335,12 +335,14 @@ def collectAnimationData(armature, frame_range, fps, step=1):
             
             if bone.name.startswith("H_"):
                 continue
+            
+            loc, rot, scl = bone.matrix.decompose()
 
             pbMatrix = armature.convert_space(pose_bone = bone,
                 matrix = bone.matrix,
                 from_space='POSE',
                 to_space ='LOCAL')
-            loc, rot, scl = pbMatrix.decompose()
+            loc, rot, scl2 = pbMatrix.decompose()#dump scale since we keep original
 
             #invert x because IDK
             scl[0] = -scl[0]
