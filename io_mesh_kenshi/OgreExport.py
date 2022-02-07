@@ -342,10 +342,12 @@ def collectAnimationData(armature, frame_range, fps, step=1):
                 matrix = bone.matrix,
                 from_space='POSE',
                 to_space ='LOCAL')
-            loc, rot, scl2 = pbMatrix.decompose()#dump scale since we keep original
+            
+            loc, rot, scl = pbMatrix.decompose()#dump scale since we keep original
 
-            #invert x because IDK
-            scl[0] = -scl[0]
+            #kludge fix, only support positive
+            #scl[0]
+            #scl[0] = -scl[0]
             
             # transform transation into parent coordinates
             loc = mat[bone.name] @ loc
