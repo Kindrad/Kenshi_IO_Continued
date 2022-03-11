@@ -2,7 +2,7 @@
 
 """
 Name: 'OGRE for Kenshi (*.MESH)'
-Blender: 2.8+
+Blender: 3.1+
 Group: 'Import/Export'
 Tooltip: 'Import/Export Kenshi OGRE mesh files'
 
@@ -13,12 +13,12 @@ Based on the Torchlight Impost/Export script by 'Dusho'
 Also thanks to'goatman' for his port of Ogre export script from 2.49b to 2.5x,
 and 'CCCenturion' for trying to refactor the code to be nicer (to be included)
 
-last edited by Kindrad 2021/10/19
+last edited by Kindrad 2022/2/11
 
 """
 
 __author__ = "someone, Kindrad"
-__version__ = "2021/10/19"
+__version__ = "2022/2/11"
 __bpydoc__ = """\
 This script imports/exports Kenshi Ogre models into/from Blender.
 
@@ -635,7 +635,7 @@ def xGetChild(node, tag):
     return None
 
 def xAnalyseFPS(xDoc):
-    fps = 0;
+    fps = 0
     lastTime = 1e8
     samples = 0
     for container in xDoc.getElementsByTagName('animations'):
@@ -648,8 +648,8 @@ def xAnalyseFPS(xDoc):
                             if keyframe.nodeType == 1:
                                 time = float(keyframe.getAttribute('time'))
                                 if time > lastTime:
-                                    fps = max(fps, 1 / (time - lastTime));
-                                lastTime = time;
+                                    fps = max(fps, 1 / (time - lastTime))
+                                lastTime = time
                                 samples = samples + 1
                                 if samples > 100:
                                     return round(fps,2)    # stop here
@@ -1297,7 +1297,7 @@ def load(operator, context, filepath, xml_converter=None, keep_xml=True, import_
                         fps = xAnalyseFPS(xDocSkeletonData)
                         if(fps and round_frames):
                             print("Setting FPS to", fps)
-                            bpy.context.scene.render.fps = fps
+                            bpy.context.scene.render.fps = int(fps)#fps # hack idk why
                         xCollectAnimations(meshData, xDocSkeletonData, round_frames)
 
             else:

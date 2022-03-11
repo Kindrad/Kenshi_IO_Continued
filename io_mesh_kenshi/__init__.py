@@ -20,7 +20,7 @@
 
 """
 Name: 'OGRE for Kenshi (*.MESH)'
-Blender: 2.8+
+Blender: 3.1+
 Group: 'Import/Export'
 Tooltip: 'Import/Export Kenshi OGRE mesh files'
 
@@ -31,12 +31,12 @@ Based on the Torchlight Impost/Export script by 'Dusho'
 Also thanks to'goatman' for his port of Ogre export script from 2.49b to 2.5x,
 and 'CCCenturion' for trying to refactor the code to be nicer (to be included)
 
-last edited by Kindrad 2021/10/19
+last edited by Kindrad 2022/2/11
 
 """
 
 __author__ = "someone, Kindrad"
-__version__ = "2021/10/19"
+__version__ = "2022/2/11"
 
 __bpydoc__ = """\
 This script imports/exports Kenshi Ogre models into/from Blender.
@@ -93,8 +93,8 @@ History:<br>
 bl_info = {
     "name": "Kenshi Tools (Continued)",
     "author": "someone, Kindrad",
-    "blender": (2, 90, 0),
-    "version": (2021, 10, 29),
+    "blender": (3, 1, 0),
+    "version": (2022, 3, 11),
     "location": "File > Import-Export",
     "description": ("Import-Export Kenshi Model files, and export Kenshi collision files. (This is continued version by Kindrad)"),
     "warning": "",
