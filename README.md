@@ -14,6 +14,7 @@ Clone locally and add a symlink from your blender addon folder to the "io_mesh_k
 
 ### New Features:
 + Works on latest Blender 3.1+
++ Meshes with skeleton can be exported to Scythe. (Thank you @boasz for figuring this out)
 + Adding "H_" to the name of a bone prevents it from being exported, use this if you want helper bones (ie: IK targets) in the skeleton.
 + Added ability to import multiple files at once. To facilitate this imported objects are named after the filename as opposed to material name (which was usually 'default')
 + Added a Batch export option. When exporting multiple meshes you can optionally batch export them, they will be named according to the object name in Blender.
