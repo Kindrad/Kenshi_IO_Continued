@@ -18,6 +18,7 @@ Clone locally and add a symlink from your blender addon folder to the "io_mesh_k
 + Adding "H_" to the name of a bone prevents it from being exported, use this if you want helper bones (ie: IK targets) in the skeleton.
 + Added ability to import multiple files at once. To facilitate this imported objects are named after the filename as opposed to material name (which was usually 'default')
 + Added a Batch export option. When exporting multiple meshes you can optionally batch export them, they will be named according to the object name in Blender.
++ Added support for exporting alpha from main vertex color. (The older "alpha" secondary vertex color set still works)
 
 ### Bugfixes compared to original:
 + Fixes bug when exporting multiple animations at once, animations no longer stack last frame of previous animation.
