@@ -1060,9 +1060,9 @@ def bCreateSubMeshes(meshData, meshName):
         me.polygons.add(FaceLength)
         for i in range(VertLength):
             me.vertices[i].co = verts[i]
-            if hasNormals:
-                me.vertices[i].normal = Vector(
-                    (normals[i][0], normals[i][1], normals[i][2]))
+            #if hasNormals:#Blender assigns normals based on windings
+                #me.vertices[i].normal = Vector(
+                    #(normals[i][0], normals[i][1], normals[i][2]))
 
         #me.vertices[VertLength].co = verts[0]
         for i in range(FaceLength):
