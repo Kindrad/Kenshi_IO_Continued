@@ -13,7 +13,7 @@ With Github:
 Clone locally and add a symlink from your blender addon folder to the "io_mesh_kenshi" folder so it works from locally cloned folder instead. This will let you update more easily.
 
 ### New Features:
-+ Works on latest Blender 3.1+
++ Works on latest Blender 3.0+
 + Meshes with skeleton can be exported to Scythe. (Thank you @boasz for figuring this out)
 + Adding "H_" to the name of a bone prevents it from being exported, use this if you want helper bones (ie: IK targets) in the skeleton.
 + Added ability to import multiple files at once. To facilitate this imported objects are named after the filename as opposed to material name (which was usually 'default')
@@ -24,6 +24,7 @@ Clone locally and add a symlink from your blender addon folder to the "io_mesh_k
 + Fixes bug when exporting multiple animations at once, animations no longer stack last frame of previous animation.
 + Fixed issue with bone constraints, drivers, etc not being applied to animations on export.
 + Fixed bug related to certain meshes failing to import vertex colors.
++ Fixed fatal crash when importing .mesh files into Blender 3.2
 + I'm sure there are others and I can't remember what they were...
 
 ### Known outstanding issues:
