@@ -2,6 +2,9 @@
 A continuation of the Kenshi IO plugin. Has some bugs fixes and new features...
 
 ### How to Install:
+
+##DO NOT USE THE ADDON INSTALL TRHOUGH BLENDER MANUALY INSTAL INSTEAD
+
 Simple:
 
 Download as zip and add the "io_mesh_kenshi" folder to your blender addons folder.
