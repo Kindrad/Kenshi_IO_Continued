@@ -3,7 +3,7 @@ A continuation of the Kenshi IO plugin. Has some bugs fixes and new features...
 
 ### How to Install:
 
-#### DO NOT USE THE ADDON INSTALL TRHOUGH BLENDER MANUALLY INSTALL INSTEAD
+#### DO NOT USE THE ADDON INSTALL THROUGH BLENDER, MANUALLY INSTALL INSTEAD
 
 Simple:
 
