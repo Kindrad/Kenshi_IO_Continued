@@ -20,7 +20,7 @@ The folder structure should look like this: "C:\Users[username]\AppData\Roaming\
 
 
 ### New Features:
-+ Works on Blender 3.0 - 3.2, possibly as far back as 2.8
++ Works on Blender 3.0+, possibly as far back as 2.8
 + Meshes with skeleton can be exported to Scythe. (Thank you @boasz for figuring this out)
 + Adding "H_" to the name of a bone prevents it from being exported, use this if you want helper bones (ie: IK targets) in the skeleton.
 + Added ability to import multiple files at once. To facilitate this imported objects are named after the filename as opposed to material name (which was usually 'default')
