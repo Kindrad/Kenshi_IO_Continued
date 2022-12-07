@@ -35,4 +35,4 @@ The folder structure should look like this: "C:\Users[username]\AppData\Roaming\
 + I'm sure there are others and I can't remember what they were...
 
 ### Known outstanding issues:
-+ There are a lot of bugs related to the exporting of Physx objects. Currently I have no intentions of fixing these as I've made a set of Unity scripts to do this instead.
++ There are a lot of bugs related to the exporting of Physx objects. Currently I have no intentions of fixing these as I've made a set of Unity scripts to do this instead. Find me on the Kenshi Discord if you want access to those.
