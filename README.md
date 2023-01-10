@@ -13,7 +13,7 @@ or
 
 With Github:
 
-Clone locally and add a symlink from your blender addon folder to the "io_mesh_kenshi" folder so it works from locally cloned folder instead. This will let you update more easily.
+Clone locally and add a symlink from your blender addon folder to the "io_mesh_kenshi_continued" folder so it works from locally cloned folder instead. This will let you update more easily.
 
 
 The folder structure should look like this: "C:\Users[username]\AppData\Roaming\Blender Foundation\Blender\3.X\scripts\addons\io_mesh_kenshi"
