@@ -7,7 +7,7 @@ A continuation of the Kenshi IO plugin. Has some bugs fixes and new features...
 
 Simple:
 
-Download as zip and add the "io_mesh_kenshi" folder to your blender addons folder.
+Download as zip and add the "io_mesh_kenshi_continued" folder to your blender addons folder.
 
 or
 
