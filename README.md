@@ -9,6 +9,8 @@ Simple:
 
 Download as zip and add the "io_mesh_kenshi_continued" folder to your blender addons folder.
 
+The folder structure should look like this: "C:\Users[username]\AppData\Roaming\Blender Foundation\Blender\3.X\scripts\addons\io_mesh_kenshi_continued"
+
 or
 
 With Github:
