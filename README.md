@@ -24,7 +24,7 @@ A continuation of the Kenshi IO plugin. Has some bugs fixes and new features...
 
 ## DO NOT USE THE ADDON INSTALL FUNCTION THROUGH BLENDER, MANUALLY INSTALL INSTEAD USING INSTRUCTIONS BELOW
 
-### Simple:
+### Simple Install:
 
 1. Download.
 <img src="https://github.com/Kindrad/Kenshi_IO_Continued/blob/main/install_instructions/Step_1.png" height="200"/>
