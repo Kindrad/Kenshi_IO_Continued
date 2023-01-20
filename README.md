@@ -1,5 +1,5 @@
 # Kenshi_IO_Continued
-A fork of the Official Kenshi Blender IO addon. This fork has new features, numerous bugfixes, and quality of life changes. This addon also supports Blender 3.0 and foward if newer Blender features are desired.
+A fork of the Official Kenshi Blender IO addon. This fork has new features, numerous bugfixes, and quality of life changes. This addon also supports Blender 3.0 and forward, it can work with Blender 2.8 and older.
 
 # New Features:
 + Works on Blender 3.0+. It should work as far back as 2.8 though
@@ -30,7 +30,11 @@ A fork of the Official Kenshi Blender IO addon. This fork has new features, nume
 <img src="https://github.com/Kindrad/Kenshi_IO_Continued/blob/main/install_instructions/Step_1.png" height="200"/>
 
 2. Add the "io_mesh_kenshi_continued" from the zip folder to your Blender addons folder.
-The folder structure should look like this: "C:\Users[username]\AppData\Roaming\Blender Foundation\Blender\3.X\scripts\addons\io_mesh_kenshi_continued" 
+
+The folder structure should look like this: "C:\Users[username]\AppData\Roaming\Blender Foundation\Blender\3.X\scripts\addons\io_mesh_kenshi_continued"
+#### Or if using Blender 2.8:
+The folder structure should look like this: "C:\[Path to Blender install directory]\Blender\2.8X\scripts\addons\io_mesh_kenshi_continued" 
+
 <img src="https://github.com/Kindrad/Kenshi_IO_Continued/blob/main/install_instructions/Step_2.png" height="200"/>
 
 3. Enable addon in the Blender addons.
