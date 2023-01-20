@@ -1,5 +1,5 @@
 # Kenshi_IO_Continued
-A continuation of the Kenshi IO plugin. Has some bugs fixes and new features...
+A fork of the Official Kenshi Blender IO addon. This fork has new features, numerous bugfixes, and quality of life changes. This addon also supports Blender 3.0 and foward if newer Blender features are desired.
 
 # New Features:
 + Works on Blender 3.0+. It should work as far back as 2.8 though
@@ -10,11 +10,11 @@ A continuation of the Kenshi IO plugin. Has some bugs fixes and new features...
 + Added support for exporting alpha from main vertex color. (The older "alpha" secondary vertex color set still works)
 
 # Bugfixes compared to original:
-+ Fixed mesh collider export
 + Fixes bug when exporting multiple animations at once, animations no longer stack last frame of previous animation.
 + Fixed issue with bone constraints, drivers, etc not being applied to animations on export.
 + Fixed bug related to certain meshes failing to import vertex colors.
-+ Fixed fatal crash when importing .mesh files into Blender 3.2
++ Fixes numerous crashes and bugs when using Blender versions 2.9 and later.
++ Fixes mesh collider export
 + I'm sure there are others and I can't remember what they were...
 
 # Known outstanding issues:
