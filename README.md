@@ -5,15 +5,15 @@ A continuation of the Kenshi IO plugin. Has some bugs fixes and new features...
 
 #### DO NOT USE THE ADDON INSTALL FUNCTION THROUGH BLENDER, MANUALLY INSTALL INSTEAD USING INSTRUCTIONS BELOW
 
-Simple:
+#####Simple:
 
 Download as zip and add the "io_mesh_kenshi_continued" folder to your blender addons folder.
 
 The folder structure should look like this: "C:\Users[username]\AppData\Roaming\Blender Foundation\Blender\3.X\scripts\addons\io_mesh_kenshi_continued"
 
-or
+#####or
 
-With Github:
+#####With Github:
 
 Clone locally and add a symlink from your blender addon folder to the "io_mesh_kenshi_continued" folder so it works from locally cloned folder instead. This will let you update more easily.
 
