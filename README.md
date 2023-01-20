@@ -22,14 +22,11 @@ The folder structure should look like this: "C:\Users[username]\AppData\Roaming\
 
 ### With Github:
 
-This will update the addon regularly. Iassume you probably don't need pictures if you are doing this.
+This will update the addon regularly. I assume you probably don't need pictures if you are doing this.
 
 1. Clone locally
-2. Add a symlink from your Blender addon folder to the "io_mesh_kenshi_continued" folder at your local git location.
+2. Add a symlink from your Blender addon folder to the "io_mesh_kenshi_continued" folder at your local git location. The symlink file structure should look like this: "C:\Users[username]\AppData\Roaming\Blender Foundation\Blender\3.X\scripts\addons\io_mesh_kenshi_continued"
 3. Enable addon in the Blender addons.
-
-
-The symlink file structure should look like this: "C:\Users[username]\AppData\Roaming\Blender Foundation\Blender\3.X\scripts\addons\io_mesh_kenshi_continued"
 
 
 # New Features:
