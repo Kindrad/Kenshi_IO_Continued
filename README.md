@@ -8,10 +8,10 @@ A continuation of the Kenshi IO plugin. Has some bugs fixes and new features...
 ### Simple:
 
 1. Download.
-<img src=https://user-images.githubusercontent.com/20009842/213611044-3884fb3c-382e-4579-b746-76cf1bc58bb3.png height="300"/>
+<img src="https://github.com/Kindrad/Kenshi_IO_Continued/blob/main/install_instructions/Step_1.png" height="300"/>
 
 2. Add the "io_mesh_kenshi_continued" from the zip folder to your Blender addons folder.
-<img src=[https://user-images.githubusercontent.com/20009842/213611044-3884fb3c-382e-4579-b746-76cf1bc58bb3.png](https://user-images.githubusercontent.com/20009842/213611839-5b801cff-715a-4a03-a4f1-208904d03865.png) height="200"/>
+<img src="https://github.com/Kindrad/Kenshi_IO_Continued/blob/main/install_instructions/Step_2.png" height="300"/>
 4. Enable addon in the Blender addons.
 
 The folder structure should look like this: "C:\Users[username]\AppData\Roaming\Blender Foundation\Blender\3.X\scripts\addons\io_mesh_kenshi_continued"
