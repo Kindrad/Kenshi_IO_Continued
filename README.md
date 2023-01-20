@@ -16,7 +16,7 @@ With Github:
 Clone locally and add a symlink from your blender addon folder to the "io_mesh_kenshi_continued" folder so it works from locally cloned folder instead. This will let you update more easily.
 
 
-The folder structure should look like this: "C:\Users[username]\AppData\Roaming\Blender Foundation\Blender\3.X\scripts\addons\io_mesh_kenshi"
+The folder structure should look like this: "C:\Users[username]\AppData\Roaming\Blender Foundation\Blender\3.X\scripts\addons\io_mesh_kenshi_continued"
 
 
 ### New Features:
@@ -28,6 +28,7 @@ The folder structure should look like this: "C:\Users[username]\AppData\Roaming\
 + Added support for exporting alpha from main vertex color. (The older "alpha" secondary vertex color set still works)
 
 ### Bugfixes compared to original:
++ Fixed mesh collider export
 + Fixes bug when exporting multiple animations at once, animations no longer stack last frame of previous animation.
 + Fixed issue with bone constraints, drivers, etc not being applied to animations on export.
 + Fixed bug related to certain meshes failing to import vertex colors.
