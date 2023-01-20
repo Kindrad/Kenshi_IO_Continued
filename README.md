@@ -8,9 +8,8 @@ A continuation of the Kenshi IO plugin. Has some bugs fixes and new features...
 ### Simple:
 
 1. Download.
-<\div style="width:50 ; height:50">
-![Step_1](https://user-images.githubusercontent.com/20009842/213611044-3884fb3c-382e-4579-b746-76cf1bc58bb3.png)
-<div>
+<img src=https://user-images.githubusercontent.com/20009842/213611044-3884fb3c-382e-4579-b746-76cf1bc58bb3.png>
+
 2. Add the "io_mesh_kenshi_continued" from the zip folder to your Blender addons folder.
 3. Enable addon in the Blender addons.
 
