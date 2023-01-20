@@ -18,11 +18,11 @@ The folder structure should look like this: "C:\Users[username]\AppData\Roaming\
 <img src="https://github.com/Kindrad/Kenshi_IO_Continued/blob/main/install_instructions/Step_3a.png" height="200"/>
 <img src="https://github.com/Kindrad/Kenshi_IO_Continued/blob/main/install_instructions/Step_3b.png" height="200"/>
 
-#### or
+### or
 
 ### With Github:
 
-This will update the addon regularly.
+This will update the addon regularly. Iassume you probably don't need pictures if you are doing this.
 
 1. Clone locally
 2. Add a symlink from your Blender addon folder to the "io_mesh_kenshi_continued" folder at your local git location.
