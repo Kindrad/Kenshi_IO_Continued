@@ -1,7 +1,7 @@
 # Kenshi_IO_Continued
 A continuation of the Kenshi IO plugin. Has some bugs fixes and new features...
 
-## How to Install:
+# How to Install:
 
 ### DO NOT USE THE ADDON INSTALL FUNCTION THROUGH BLENDER, MANUALLY INSTALL INSTEAD USING INSTRUCTIONS BELOW
 
