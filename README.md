@@ -38,4 +38,4 @@ The folder structure should look like this: "C:\Users[username]\AppData\Roaming\
 + I'm sure there are others and I can't remember what they were...
 
 # Known outstanding issues:
-+ There are a lot of bugs related to the exporting of Physx objects. Currently I have no intentions of fixing these as I've made a set of Unity scripts to do this instead. Find me on the Kenshi Discord if you want access to those.
++ There are still some bugs related to the export of colliders. Box and (non-convex) Mesh Colliders should work (these are the most important). Sphere, Capsule, and Convex Mesh Colliders are still problematic. As Box and Mesh are more important fixing these is low priority.
