@@ -22,6 +22,7 @@ import os
 import math
 from mathutils import Vector, Matrix
 import bpy
+import bmesh
 from xml.dom import minidom
 __author__ = "someone, Kindrad"
 __version__ = "2022/2/11"
@@ -815,14 +816,14 @@ def bCreateAnimations(meshData):
 ## =========================================================================================== ##
 
 
-def bCreateMesh(meshData, folder, name, filepath):
+def bCreateMesh(meshData, folder, name, filepath, normal_mode):
 
     if 'skeleton' in meshData:
         skeletonName = meshData['skeletonName']
         bCreateSkeleton(meshData, skeletonName)
 
     # from collected data create all sub meshes
-    subObjs = bCreateSubMeshes(meshData, name)
+    subObjs = bCreateSubMeshes(meshData, name, normal_mode)
     # skin submeshes
     # bSkinMesh(subObjs)
 
@@ -1016,7 +1017,31 @@ def bMergeVertices(subMesh):
             face[i] = map[face[i]]
 
 
-def bCreateSubMeshes(meshData, meshName):
+def match_edge(edge1, edge2):
+    if edge1[0] == edge2[0] and edge1[1] == edge2[1]:
+        return True
+    if edge1[0] == edge2[1] and edge1[1] == edge2[0]:
+        return True
+    return False
+
+def edge_in_polygon(edge, verts):
+    if match_edge(edge, [verts[0], verts[1]]):
+        return True
+    if match_edge(edge, [verts[1], verts[2]]):
+        return True
+    if match_edge(edge, [verts[2], verts[0]]):
+        return True
+    return False
+
+def compare_vector(vec1, vec2):
+    if len(vec1) != len(vec2):
+                        return False
+    for i in range(0, len(vec1)):
+        if vec1[i] != vec2[i]:
+            return False
+    return True
+
+def bCreateSubMeshes(meshData, meshName, normal_mode):
 
     allObjects = []
     submeshes = meshData['submeshes']
@@ -1071,7 +1096,8 @@ def bCreateSubMeshes(meshData, meshName):
             me.loops[i*3+2].vertex_index = faces[i][2]
             me.polygons[i].loop_start = i*3
             me.polygons[i].loop_total = 3
-            me.polygons[i].use_smooth
+            if normal_mode != 'flat':
+                me.polygons[i].use_smooth = True
 
         #meshFaces = me.tessfaces
         #meshUV_textures = me.tessface_uv_textures
@@ -1198,33 +1224,77 @@ def bCreateSubMeshes(meshData, meshName):
 
         # Update mesh with new data
         me.update(calc_edges=True)
-        me.use_auto_smooth = True
+        if normal_mode == 'custom':
+            me.use_auto_smooth = True
 
-        bpy.ops.object.editmode_toggle()
-        bpy.ops.mesh.remove_doubles(threshold=0.001)
-        bpy.ops.object.editmode_toggle()
         # Update mesh with new data
         #me.update(calc_edges=True, calc_tessface=True)
 
-        # try to set custom normals
-        if hasNormals:
-            noChange = len(me.loops) == len(faces)*3
-            if not noChange:
-                print('Removed',  len(faces) - len(me.loops)/3, 'faces')
-            split = []
-            polyIndex = 0
-            for face in faces:
-                if noChange or matchFace(face, verts, me, polyIndex):
-                    polyIndex += 1
-                    for vx in face:
-                        split.append(normals[vx])
+        #attempt to mark sharp edges that aren't equal?
+        if normal_mode == 'splits':
+            
+            mod = ob.modifiers.new('Edge Splits', 'EDGE_SPLIT')
+            mod.use_edge_angle = False
+            mod.use_edge_sharp = True
 
-            if len(split) == len(me.loops):
-                me.normals_split_custom_set(split)
-            else:
-                #operator.report( {'WARNING'}, "Failed to import mesh normals")
-                print('Warning: Failed to import mesh normals',
-                      polyIndex, '/', len(me.polygons))
+            if hasNormals:
+                noChange = len(me.loops) == len(faces)*3
+                if not noChange:
+                    print('Removed',  len(faces) - len(me.loops)/3, 'faces')
+
+                dupe_verts = []
+                for i in range(0, len(verts)):
+                    dupe_verts.append(0)
+                
+                for i in range(0, len(verts)):
+                    count = 0
+                    for j in range(0, (len(verts))):
+                        if i != j:
+                            if compare_vector(verts[i], verts[j]):
+                                if compare_vector(normals[i], normals[j]):
+                                    dupe_verts[i] += 1
+
+
+                for edge in me.edges:
+                    count = 0
+                    for polygon in me.polygons:
+                        if edge_in_polygon(edge.vertices, polygon.vertices):
+                            if dupe_verts[edge.vertices[0]] == 0:
+                                if dupe_verts[edge.vertices[1]] == 0:
+                                    count += 1
+                    if count == 1:
+                        edge.use_edge_sharp = True
+        
+        #remove doubles
+        bpy.ops.object.editmode_toggle()
+        bpy.ops.mesh.remove_doubles(threshold=0.001)
+        bpy.ops.object.editmode_toggle()
+
+
+
+
+
+        #try to set custom normals
+        if normal_mode == 'custom':
+            if hasNormals:
+                noChange = len(me.loops) == len(faces)*3
+                if not noChange:
+                    print('Removed',  len(faces) - len(me.loops)/3, 'faces')
+                split = []
+                polyIndex = 0
+                for face in faces:
+                    if noChange or matchFace(face, verts, me, polyIndex):
+                        polyIndex += 1
+                        for vx in face:
+                            split.append(normals[vx])
+
+                if len(split) == len(me.loops):
+                    me.normals_split_custom_set(split)
+                else:
+                    operator.report( {'WARNING'}, "Failed to import mesh normals")
+                    print('Warning: Failed to import mesh normals',
+                        polyIndex, '/', len(me.polygons))
+
 
         allObjects.append(ob)
 
@@ -1286,7 +1356,7 @@ def getBoneNameMapFromArmature(arm):
     return boneMap
 
 
-def load(operator, context, filepath, xml_converter=None, keep_xml=True, import_normals=True, import_shapekeys=True, import_animations=False, round_frames=False, use_selected_skeleton=False):
+def load(operator, context, filepath, xml_converter=None, keep_xml=True, import_normals=True, normal_mode="custom",import_shapekeys=True, import_animations=False, round_frames=False, use_selected_skeleton=False):
     global blender_version
 
     blender_version = bpy.app.version[0]*100 + bpy.app.version[1]
@@ -1381,7 +1451,7 @@ def load(operator, context, filepath, xml_converter=None, keep_xml=True, import_
 
         # after collecting is done, start creating stuff#
         # create skeleton (if any) and mesh from parsed data
-        bCreateMesh(meshData, folder, onlyName, pathMeshXml)
+        bCreateMesh(meshData, folder, onlyName, pathMeshXml, normal_mode)
         bCreateAnimations(meshData)
         if not keep_xml:
             # cleanup by deleting the XML file we created

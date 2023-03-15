@@ -174,6 +174,18 @@ class ImportOgre(bpy.types.Operator, ImportHelper):
         default=True,
     )
 
+    normal_mode: EnumProperty(
+        items = [
+        ("custom", "Import Custom Normals", "Imports normals from mesh", 1),
+        ("flat", "Calculate Flat Normals", "Calculates flat normals for mesh", 2),
+        ("smooth", "Calculate Smooth Normals", "Calculates Smooth Nnrmals for mesh", 3),
+        ("splits", "Calculate Smooth Normals + Extract Splits", "Calculates Smooth normals for mesh, detects edge splits and adds them as 'Mark Sharp'", 4)
+        ],
+        name = "Normal Import Mode",
+        description = "The mode in which to import normals",
+        default = "custom"
+    )
+
     import_animations: BoolProperty(
         name="Import animation",
         description="Import animations as actions",
@@ -237,6 +249,7 @@ class ImportOgre(bpy.types.Operator, ImportHelper):
         layout.prop(self, "xml_converter")
         layout.prop(self, "keep_xml")
         layout.prop(self, "import_normals")
+        layout.prop(self, "normal_mode")
         layout.prop(self, "import_shapekeys")
 
         link = layout.column()
@@ -365,6 +378,8 @@ class ExportOgre(bpy.types.Operator, ExportHelper):
     def execute(self, context):
         from . import OgreExport
         from mathutils import Matrix
+
+        print("Exporting using github version")
 
         keywords = self.as_keywords(ignore=("check_existing", "filter_glob"))
         keywords['xml_converter'] = findConverter(keywords['xml_converter'])
