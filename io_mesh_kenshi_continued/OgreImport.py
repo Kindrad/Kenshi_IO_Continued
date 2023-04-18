@@ -1451,6 +1451,9 @@ def load(operator, context, filepath, xml_converter=None, keep_xml=True, import_
 
         # after collecting is done, start creating stuff#
         # create skeleton (if any) and mesh from parsed data
+
+        
+
         bCreateMesh(meshData, folder, onlyName, pathMeshXml, normal_mode)
         bCreateAnimations(meshData)
         if not keep_xml:
