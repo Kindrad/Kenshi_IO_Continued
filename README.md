@@ -8,6 +8,7 @@ A fork of the Official Kenshi Blender IO addon. This fork has new features, nume
 + Added ability to import multiple files at once. To facilitate this imported objects are named after the filename as opposed to material name (which was usually 'default')
 + Added a Batch export option. When exporting multiple meshes you can optionally batch export them, they will be named according to the object name in Blender.
 + Added support for exporting alpha from main vertex color. (The older "alpha" secondary vertex color set still works)
++ Added different normal importing modes. Including edge-split recovery mode. Read tooltips for more details.
 
 # Bugfixes compared to original:
 + Fixes bug when exporting multiple animations at once, animations no longer stack last frame of previous animation.
