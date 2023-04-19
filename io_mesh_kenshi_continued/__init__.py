@@ -31,8 +31,9 @@ Based on the Torchlight Impost/Export script by 'Dusho'
 Also thanks to'goatman' for his port of Ogre export script from 2.49b to 2.5x,
 and 'CCCenturion' for trying to refactor the code to be nicer (to be included)
 
-last edited by Kindrad Oct 11 2022
+I took over this sometime in 2021 (Kindrad)
 
+last edited by Kindrad April 17 2023
 """
 
 from bpy_extras.io_utils import (ExportHelper,
@@ -48,7 +49,7 @@ from bpy.props import (BoolProperty,
                        )
 import bpy
 __author__ = "someone, Kindrad"
-__version__ = "2022/10/11"
+__version__ = "2023/4/17"
 
 __bpydoc__ = """\
 This script imports/exports Kenshi Ogre models into/from Blender.
@@ -62,6 +63,7 @@ Supported:<br>
     * import/export of vertex colour (RGB)
     * import/export of vertex alpha (Uses second vertex colour layer called Alpha)
     * import/export of shape keys
+    * Import/export of materials
     * Calculation of tangents and binormals for export
 
 
@@ -69,7 +71,9 @@ Known issues:<br>
     * imported materials will lose certain informations not applicable to Blender when exported
 
 History:<br>
-    * v2022-10-11(11-Oct-2022) - Keep forgetting to update here, read the github instead (kindrad)
+    * Aside: I Keep  forgetting to update here, read the github instead (kindrad)
+    * v2023-4-17 (17-Apr-2023) - Added material importing
+    * v2022-10-11 (11-Oct-2022) - Just putting it here, Updated to Blender 3.X+ API (Should work as far back as 2.8 though)
     * v0.9.1   (13-Sep-2019) - Fixed importing skeletons
     * v0.9.0   (07-May-2019) - Switched to Blender 2.80 API
     * v0.8.15  (17-Jul-2019) - Added option to import normals
@@ -106,7 +110,7 @@ History:<br>
 bl_info = {
     "name": "Kenshi Tools (IO_Continued)",
     "author": "someone, Kindrad",
-    "blender": (3, 1, 0),
+    "blender": (3, 0, 0),
     "version": (2022, 10, 11),
     "location": "File > Import-Export",
     "description": ("Import-Export Kenshi Model files, and export Kenshi collision files. (This is continued version by Kindrad)"),
@@ -210,6 +214,12 @@ class ImportOgre(bpy.types.Operator, ImportHelper):
         default=False,
     )
 
+    import_materials: BoolProperty(
+        name = "Import Materials",
+        description = "Add material to meshes based on name, if the material doesn't exist a blank one is created.",
+        default = True
+    )
+
     filter_glob: StringProperty(
         default="*.mesh;*.MESH;.xml;.XML",
         options={'HIDDEN'},
@@ -261,6 +271,9 @@ class ImportOgre(bpy.types.Operator, ImportHelper):
         rate = layout.column()
         rate.enabled = self.import_animations
         rate.prop(self, "round_frames")
+
+        layout.prop(self, "import_materials")
+
 
 ##############################################################################################################################
 

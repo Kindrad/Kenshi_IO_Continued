@@ -13,8 +13,9 @@ Based on the Torchlight Impost/Export script by 'Dusho'
 Also thanks to'goatman' for his port of Ogre export script from 2.49b to 2.5x,
 and 'CCCenturion' for trying to refactor the code to be nicer (to be included)
 
-last edited by Kindrad 2022/2/11
+I took over this sometime in 2021 (Kindrad)
 
+last edited by Kindrad April 17 2023
 """
 
 import subprocess
@@ -25,7 +26,7 @@ import bpy
 import bmesh
 from xml.dom import minidom
 __author__ = "someone, Kindrad"
-__version__ = "2022/2/11"
+__version__ = "2023/4/17"
 __bpydoc__ = """\
 This script imports/exports Kenshi Ogre models into/from Blender.
 
@@ -38,6 +39,7 @@ Supported:<br>
     * import/export of vertex colour (RGB)
     * import/export of vertex alpha (Uses second vertex colour layer called Alpha)
     * import/export of shape keys
+    * Import/export of materials
     * Calculation of tangents and binormals for export
 
 
@@ -45,6 +47,9 @@ Known issues:<br>
     * imported materials will lose certain informations not applicable to Blender when exported
 
 History:<br>
+    * Aside: I Keep  forgetting to update here, read the github instead (kindrad)
+    * v2023-4-17 (17-Apr-2023) - Added material importing
+    * v2022-10-11 (11-Oct-2022) - Just putting it here, Updated to Blender 3.X+ API (Should work as far back as 2.8 though)
     * v0.9.1   (13-Sep-2019) - Fixed importing skeletons
     * v0.9.0   (07-May-2019) - Switched to Blender 2.80 API
     * v0.8.15  (17-Jul-2019) - Added option to import normals
@@ -816,14 +821,14 @@ def bCreateAnimations(meshData):
 ## =========================================================================================== ##
 
 
-def bCreateMesh(meshData, folder, name, filepath, normal_mode):
+def bCreateMesh(meshData, folder, name, filepath, import_params):
 
     if 'skeleton' in meshData:
         skeletonName = meshData['skeletonName']
         bCreateSkeleton(meshData, skeletonName)
 
     # from collected data create all sub meshes
-    subObjs = bCreateSubMeshes(meshData, name, normal_mode)
+    subObjs = bCreateSubMeshes(meshData, name, import_params)
     # skin submeshes
     # bSkinMesh(subObjs)
 
@@ -1041,7 +1046,7 @@ def compare_vector(vec1, vec2):
             return False
     return True
 
-def bCreateSubMeshes(meshData, meshName, normal_mode):
+def bCreateSubMeshes(meshData, meshName, import_params):
 
     allObjects = []
     submeshes = meshData['submeshes']
@@ -1054,7 +1059,8 @@ def bCreateSubMeshes(meshData, meshName, normal_mode):
         subMeshName = meshName
 
         if len(submeshes) > 1:
-            subMeshName = subMeshName + " " + subMeshData['material']
+            for i in range( 1, len(submeshes)):
+                subMeshName = subMeshName + "_" + str(i)
 
         # Create mesh and object
         me = bpy.data.meshes.new(subMeshName)
@@ -1096,7 +1102,7 @@ def bCreateSubMeshes(meshData, meshName, normal_mode):
             me.loops[i*3+2].vertex_index = faces[i][2]
             me.polygons[i].loop_start = i*3
             me.polygons[i].loop_total = 3
-            if normal_mode != 'flat':
+            if import_params['normal_mode'] != 'flat':
                 me.polygons[i].use_smooth = True
 
         #meshFaces = me.tessfaces
@@ -1104,51 +1110,62 @@ def bCreateSubMeshes(meshData, meshName, normal_mode):
         #meshVertex_colors = me.tessface_vertex_colors
         #meshUV_textures = me.uv_textures
 
-        hasTexture = False
-        # material for the submesh
-        # Create image texture from image.
-        if subMeshName in meshData['materials']:
-            matInfo = meshData['materials'][subMeshName]  # material data
-            if 'texture' in matInfo:
-                texturePath = matInfo['texture']
-                if texturePath:
-                    hasTexture = True
-                    # try to find among already loaded images
-                    tex = None
-                    for lTex in bpy.data.textures:
-                        if lTex.type == 'IMAGE':
-                            if lTex.image.name == matInfo['imageNameOnly']:
-                                tex = lTex
-                                break
-                    if not tex:
-                        tex = bpy.data.textures.new('ColorTex', type='IMAGE')
-                        tex.image = bpy.data.images.load(texturePath)
-                        tex.use_alpha = True
+        # hasTexture = False
+        # # material for the submesh
+        # # Create image texture from image.
+        # if subMeshName in meshData['materials']:
+        #     matInfo = meshData['materials'][subMeshName]  # material data
+        #     if 'texture' in matInfo:
+        #         texturePath = matInfo['texture']
+        #         if texturePath:
+        #             hasTexture = True
+        #             # try to find among already loaded images
+        #             tex = None
+        #             for lTex in bpy.data.textures:
+        #                 if lTex.type == 'IMAGE':
+        #                     if lTex.image.name == matInfo['imageNameOnly']:
+        #                         tex = lTex
+        #                         break
+        #             if not tex:
+        #                 tex = bpy.data.textures.new('ColorTex', type='IMAGE')
+        #                 tex.image = bpy.data.images.load(texturePath)
+        #                 tex.use_alpha = True
 
-            # Create shadeless material and MTex
-            mat = bpy.data.materials.new(subMeshName)
-            # ambient
-            if 'ambient' in matInfo:
-                mat.ambient = matInfo['ambient'][0]
-            # diffuse
-            if 'diffuse' in matInfo:
-                mat.diffuse_color = matInfo['diffuse']
-            # specular
-            if 'specular' in matInfo:
-                mat.specular_color = matInfo['specular']
-            # emmisive
-            if 'emissive' in matInfo:
-                mat.emit = matInfo['emissive'][0]
-            mat.use_shadeless = True
-            mtex = mat.texture_slots.add()
-            if hasTexture:
-                mtex.texture = tex
-            mtex.texture_coords = 'UV'
-            mtex.use_map_color_diffuse = True
+        #     # Create shadeless material and MTex
+        #     mat = bpy.data.materials.new(subMeshName)
+        #     # ambient
+        #     if 'ambient' in matInfo:
+        #         mat.ambient = matInfo['ambient'][0]
+        #     # diffuse
+        #     if 'diffuse' in matInfo:
+        #         mat.diffuse_color = matInfo['diffuse']
+        #     # specular
+        #     if 'specular' in matInfo:
+        #         mat.specular_color = matInfo['specular']
+        #     # emmisive
+        #     if 'emissive' in matInfo:
+        #         mat.emit = matInfo['emissive'][0]
+        #     mat.use_shadeless = True
+        #     mtex = mat.texture_slots.add()
+        #     if hasTexture:
+        #         mtex.texture = tex
+        #     mtex.texture_coords = 'UV'
+        #     mtex.use_map_color_diffuse = True
 
-            # add material to object
-            ob.data.materials.append(mat)
-            # print(me.uv_textures[0].data.values()[0].image)
+        #     # add material to object
+        #     ob.data.materials.append(mat)
+        #     # print(me.uv_textures[0].data.values()[0].image)
+        
+        print("import_materials = " + str(import_params["import_materials"]))
+
+        if import_params["import_materials"]:
+            print("Looking for material: " + subMeshData['material'])
+            if bpy.data.materials.find(subMeshData['material']) == -1:
+                print("Created new material: " + subMeshData['material'])
+                bpy.data.materials.new(name = subMeshData['material'])
+
+            ob.data.materials.append(bpy.data.materials.get(subMeshData['material']))
+
 
         # texture coordinates
         if 'texcoordsets' in geometry and 'uvsets' in geometry:
@@ -1224,14 +1241,14 @@ def bCreateSubMeshes(meshData, meshName, normal_mode):
 
         # Update mesh with new data
         me.update(calc_edges=True)
-        if normal_mode == 'custom':
+        if import_params['normal_mode'] == 'custom':
             me.use_auto_smooth = True
 
         # Update mesh with new data
         #me.update(calc_edges=True, calc_tessface=True)
 
         #attempt to mark sharp edges that aren't equal?
-        if normal_mode == 'splits':
+        if import_params['normal_mode'] == 'splits':
             
             mod = ob.modifiers.new('Edge Splits', 'EDGE_SPLIT')
             mod.use_edge_angle = False
@@ -1275,7 +1292,7 @@ def bCreateSubMeshes(meshData, meshName, normal_mode):
 
 
         #try to set custom normals
-        if normal_mode == 'custom':
+        if import_params['normal_mode'] == 'custom':
             if hasNormals:
                 noChange = len(me.loops) == len(faces)*3
                 if not noChange:
@@ -1356,7 +1373,31 @@ def getBoneNameMapFromArmature(arm):
     return boneMap
 
 
-def load(operator, context, filepath, xml_converter=None, keep_xml=True, import_normals=True, normal_mode="custom",import_shapekeys=True, import_animations=False, round_frames=False, use_selected_skeleton=False):
+def load(operator,
+         context,
+         filepath,
+         xml_converter=None,
+         keep_xml=True,
+         import_normals=True,
+         normal_mode="custom",
+         import_shapekeys=True,
+         import_animations=False,
+         round_frames=False,
+         use_selected_skeleton=False,
+         import_materials=True):
+    
+    import_params = {
+        "xml_converter" : xml_converter,
+        "keep_xml" : keep_xml,
+        "import_normals" : import_normals,
+        "normal_mode" : normal_mode,
+        "import_shapekeys" : import_shapekeys,
+        "import_animations" : import_animations,
+        "round_frames" : round_frames,
+        "use_selected_skeleton" : use_selected_skeleton,
+        "import_materials" : import_materials
+    }
+
     global blender_version
 
     blender_version = bpy.app.version[0]*100 + bpy.app.version[1]
@@ -1452,9 +1493,9 @@ def load(operator, context, filepath, xml_converter=None, keep_xml=True, import_
         # after collecting is done, start creating stuff#
         # create skeleton (if any) and mesh from parsed data
 
-        
 
-        bCreateMesh(meshData, folder, onlyName, pathMeshXml, normal_mode)
+
+        bCreateMesh(meshData, folder, onlyName, pathMeshXml, import_params)
         bCreateAnimations(meshData)
         if not keep_xml:
             # cleanup by deleting the XML file we created
