@@ -17,7 +17,7 @@ A fork of the Official Kenshi Blender IO addon. This fork has new features, nume
 + Fixed bug related to certain meshes failing to import vertex colors.
 + Fixes numerous crashes and bugs when using Blender versions 2.9 and later.
 + Fixes mesh collider export
-+ Only exports highest 4 weight values. Not really a bug but Kenshi only supports 4 weights, this prevents weird errors vs old version.
++ Only exports highest 3 weight values. Not really a bug but Kenshi only supports 3 weights, this prevents weird errors vs old version.
 + I'm sure there are others and I can't remember what they were...
 
 # Known outstanding issues:
