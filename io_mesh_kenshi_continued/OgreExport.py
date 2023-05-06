@@ -1,4 +1,22 @@
-#!BPY
+# ##### BEGIN GPL LICENSE BLOCK #####
+#
+#  This program is free software; you can redistribute it and/or
+#  modify it under the terms of the GNU General Public License
+#  as published by the Free Software Foundation; either version 2
+#  of the License, or (at your option) any later version.
+#
+#  This program is distributed in the hope that it will be useful,
+#  but WITHOUT ANY WARRANTY; without even the implied warranty of
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#  GNU General Public License for more details.
+#
+#  You should have received a copy of the GNU General Public License
+#  along with this program; if not, write to the Free Software Foundation,
+#  Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
+#
+# ##### END GPL LICENSE BLOCK #####
+
+# <pep8-80 compliant>
 
 """
 Name: 'OGRE for Kenshi (*.MESH)'
@@ -13,12 +31,13 @@ Based on the Torchlight Impost/Export script by 'Dusho'
 Also thanks to'goatman' for his port of Ogre export script from 2.49b to 2.5x,
 and 'CCCenturion' for trying to refactor the code to be nicer (to be included)
 
-last edited by Kindrad 2022/2/11
+I took over this sometime in 2021 (Kindrad)
 
+last edited by Kindrad May 6 2023
 """
 
 __author__ = "someone, Kindrad"
-__version__ = "2022/2/11"
+__version__ = "2023/5/6"
 
 __bpydoc__ = """\
 This script imports/exports Kenshi Ogre models into/from Blender.
@@ -32,6 +51,7 @@ Supported:<br>
     * import/export of vertex colour (RGB)
     * import/export of vertex alpha (Uses second vertex colour layer called Alpha)
     * import/export of shape keys
+    * Import/export of materials
     * Calculation of tangents and binormals for export
 
 
@@ -39,10 +59,13 @@ Known issues:<br>
     * imported materials will lose certain informations not applicable to Blender when exported
 
 History:<br>
-    * v0.9.3   (18-Oct-2020) - Added prefix ignore: The exportation of skeleton and animations now ignores bones prefixed by "H_".
-    * v0.9.2   (15-Oct-2020) - Added kludge to fix bug with animation export consisting of multiple actions where some are missing keyframe data. Verified it works with Blender 2.9
+    * v2023-5-6 (6-May-2023) - Now limits exports to 4 highest weights. Optional renormalization on export.
+    * Aside: I Keep  forgetting to update here, read the github instead (kindrad)
+    * v2023-4-17 (17-Apr-2023) - Added material importing
+    * v2022-10-11 (11-Oct-2022) - Just putting it here, Updated to Blender 3.X+ API (Should work as far back as 2.8 though)
     * v0.9.1   (13-Sep-2019) - Fixed importing skeletons
     * v0.9.0   (07-May-2019) - Switched to Blender 2.80 API
+    * v0.8.15  (17-Jul-2019) - Added option to import normals
     * v0.8.14  (14-May-2019) - Fixed blender deleting zero length bones
     * v0.8.13  (19-Mar-2019) - Exporting material files is optional
     * v0.8.12  (14-Mar-2019) - Fixed error exporting animation scale keyframes
@@ -826,7 +849,7 @@ def luminosity(c):
     return c[0] * 0.25 + c[1] * 0.5 + c[2] * 0.25
 
 
-def bCollectMeshData(meshData, selectedObjects, applyModifiers, exportColour, exportTangents, exportBinormals, exportPoses):
+def bCollectMeshData(meshData, selectedObjects, export_params):
     import bmesh
     subMeshesData = []
     for ob in selectedObjects:
@@ -839,7 +862,7 @@ def bCollectMeshData(meshData, selectedObjects, applyModifiers, exportColour, ex
 
         #mesh = bpy.types.Mesh ##
         tobj = ob.evaluated_get(
-            bpy.context.evaluated_depsgraph_get()) if applyModifiers else ob
+            bpy.context.evaluated_depsgraph_get()) if export_params['apply_modifiers'] else ob
         mesh = tobj.to_mesh()
 
         # use bmesh to triangulate
@@ -851,8 +874,8 @@ def bCollectMeshData(meshData, selectedObjects, applyModifiers, exportColour, ex
 
         # Calculate normals and tangents
         if not mesh.uv_layers.active:
-            exportTangents = exportBinormals = False
-        if exportTangents:
+            export_params["export_tangents"] = export_params["export_binormals"] = False
+        if export_params["export_tangents"]:
             mesh.calc_tangents(uvmap=mesh.uv_layers.active.name)
         else:
             mesh.calc_normals_split()
@@ -863,7 +886,7 @@ def bCollectMeshData(meshData, selectedObjects, applyModifiers, exportColour, ex
         # Pick colour data
         colourData = None
         alphaData = None
-        if mesh.vertex_colors.active and exportColour:
+        if mesh.vertex_colors.active and export_params["export_colour"]:
             colourData = mesh.vertex_colors.active.data
             for layer in mesh.vertex_colors:
                 if layer.name.lower() == 'alpha':
@@ -922,16 +945,59 @@ def bCollectMeshData(meshData, selectedObjects, applyModifiers, exportColour, ex
 
                 tangent = mesh.loops[loop].tangent[:] + \
                     (mesh.loops[loop].bitangent_sign,
-                     ) if exportTangents else None
+                     ) if export_params["export_tangents"] else None
                 binormal = mesh.loops[loop].bitangent * - \
-                    1 if exportBinormals else None
+                    1 if export_params["export_binormals"] else None
 
                 # vertex groups
                 boneWeights = {}
-                for vxGroup in mesh.vertices[vertex].groups:
-                    if vxGroup.weight > 0.01:
+                if len(mesh.vertices[vertex].groups) <= 4:
+                    #we have 4 or less bone weights, just dump all of them into mesh weights
+                    for vxGroup in mesh.vertices[vertex].groups:
                         vg = ob.vertex_groups[vxGroup.group]
                         boneWeights[vg.name] = vxGroup.weight
+                else:
+                    #We have more than 4 bone weights, Only take highest 4 weights
+                    weightList = mesh.vertices[vertex].groups.items()
+
+                    tempWeights = []
+                    for i in range(4):
+                        tempWeights.append(weightList[i])
+                    
+                    minWeight = 0#index to smallest weight
+
+                    #get smallest weight index
+                    for i in range(4):
+                        if tempWeights[i][1].weight < tempWeights[minWeight][1].weight:
+                            minWeight = i
+                    
+                    #iterate through the weights, this should get us the smallest 4 weights in an arbitrary order
+                    for i in range(4, len(weightList)):
+                        if weightList[i][1].weight > tempWeights[minWeight][1].weight:
+                            tempWeights[minWeight] = weightList[i]
+
+                            #get smallest weight again
+                            for i in range(4):
+                                if tempWeights[i][1].weight < tempWeights[minWeight][1].weight:
+                                    minWeight = i
+
+                    for w in tempWeights:
+                        vg = ob.vertex_groups[w[1].group]
+                        boneWeights[vg.name] = w[1].weight
+                    
+                #optional renormalize
+                if export_params["renormalize_weights"]:
+                    weightTotal = 0
+                    for bkey in boneWeights:
+                        weightTotal += boneWeights[bkey]
+                    
+                    for bkey in boneWeights:
+                        boneWeights[bkey] /= weightTotal
+
+
+                    
+
+
 
                 # Add vertex
                 vert = VertexInfo(px, py, pz, nx, ny, nz, u, v, r,
@@ -970,12 +1036,12 @@ def bCollectMeshData(meshData, selectedObjects, applyModifiers, exportColour, ex
                 boneWeights.append([boneW, vxInfo.boneWeights[boneW]])
             boneAssignments.append(boneWeights)
 
-        if exportTangents:
+        if export_params["export_tangents"]:
             for vxInfo in vertexList:
                 tangents.append(vxInfo.tangent)
                 binormals.append(vxInfo.binormal)
 
-            if not exportBinormals:
+            if not export_params["export_binormals"]:
                 for vxInfo in vertexList:
                     if vxInfo.tangent[3] < 0:
                         needsParity = True
@@ -989,7 +1055,7 @@ def bCollectMeshData(meshData, selectedObjects, applyModifiers, exportColour, ex
 
         # Shape keys - poses
         poses = None
-        if exportPoses and mesh.shape_keys and mesh.shape_keys.key_blocks:
+        if export_params["export_poses"] and mesh.shape_keys and mesh.shape_keys.key_blocks:
             poses = {}
             for pose in mesh.shape_keys.key_blocks:
                 if pose.relative_key:
@@ -1014,10 +1080,10 @@ def bCollectMeshData(meshData, selectedObjects, applyModifiers, exportColour, ex
             geometry['uvsets'] = uvTex
         if colourData or alphaData:
             geometry['colours'] = colours
-        if exportTangents:
+        if export_params["export_tangents"]:
             geometry['tangents'] = tangents
             geometry['parity'] = needsParity
-        if exportBinormals:
+        if export_params["export_binormals"]:
             geometry['binormals'] = binormals
 
         # need bone name to bone ID dict
@@ -1129,8 +1195,28 @@ def save(operator, context, filepath,
          export_skeleton=False,
          export_poses=False,
          export_animation=False,
+         renormalize_weights=True,
          batch_export=False,
          ):
+
+    export_params = {
+         "xml_converter" : xml_converter,
+         "keep_xml" : keep_xml,
+         "export_tangents" : export_tangents,
+         "export_binormals" : export_binormals,
+         "export_colour" : export_colour,
+         "tangent_parity" : tangent_parity,
+         "apply_transform" : apply_transform,
+         "apply_modifiers" : apply_modifiers,
+         "export_materials" : export_materials,
+         "overwrite_material" : overwrite_material,
+         "copy_textures" : copy_textures,
+         "export_skeleton" : export_skeleton,
+         "export_poses" : export_poses,
+         "export_animation" : export_animation,
+         "renormalize_weights": renormalize_weights,
+         "batch_export" : batch_export
+    }
 
     global blender_version
 
@@ -1170,8 +1256,7 @@ def save(operator, context, filepath,
         # skeleton
         bCollectSkeletonData(blenderMeshData, selectedObjects)
         # mesh
-        bCollectMeshData(blenderMeshData, selectedObjects, apply_modifiers,
-                         export_colour, export_tangents, export_binormals, export_poses)
+        bCollectMeshData(blenderMeshData, selectedObjects, export_params)
         # materials
         if export_materials:
             bCollectMaterialData(blenderMeshData, selectedObjects)
@@ -1242,8 +1327,7 @@ def save(operator, context, filepath,
             # skeleton
             bCollectSkeletonData(blenderMeshData, selectedObj)
             # mesh
-            bCollectMeshData(blenderMeshData, selectedObj, apply_modifiers,
-                             export_colour, export_tangents, export_binormals, export_poses)
+            bCollectMeshData(blenderMeshData, selectedObj, export_params)
             # materials
             if export_materials:
                 bCollectMaterialData(blenderMeshData, selectedObj)

@@ -33,23 +33,11 @@ and 'CCCenturion' for trying to refactor the code to be nicer (to be included)
 
 I took over this sometime in 2021 (Kindrad)
 
-last edited by Kindrad April 17 2023
+last edited by Kindrad May 6 2023
 """
 
-from bpy_extras.io_utils import (ExportHelper,
-                                 ImportHelper,
-                                 path_reference_mode,
-                                 axis_conversion,
-                                 )
-from bpy.props import (BoolProperty,
-                       FloatProperty,
-                       StringProperty,
-                       EnumProperty,
-                       CollectionProperty,
-                       )
-import bpy
 __author__ = "someone, Kindrad"
-__version__ = "2023/4/17"
+__version__ = "2023/5/6"
 
 __bpydoc__ = """\
 This script imports/exports Kenshi Ogre models into/from Blender.
@@ -71,6 +59,7 @@ Known issues:<br>
     * imported materials will lose certain informations not applicable to Blender when exported
 
 History:<br>
+    * v2023-5-6 (6-May-2023) - Now limits exports to 4 highest weights. Optional renormalization on export.
     * Aside: I Keep  forgetting to update here, read the github instead (kindrad)
     * v2023-4-17 (17-Apr-2023) - Added material importing
     * v2022-10-11 (11-Oct-2022) - Just putting it here, Updated to Blender 3.X+ API (Should work as far back as 2.8 though)
@@ -111,7 +100,7 @@ bl_info = {
     "name": "Kenshi Tools (IO_Continued)",
     "author": "someone, Kindrad",
     "blender": (3, 0, 0),
-    "version": (2022, 10, 11),
+    "version": (2022, 5, 6),
     "location": "File > Import-Export",
     "description": ("Import-Export Kenshi Model files, and export Kenshi collision files. (This is continued version by Kindrad)"),
     "warning": "",
@@ -119,6 +108,19 @@ bl_info = {
     "tracker_url": "http://lofigames.com/phpBB3/",
     "support": 'OFFICIAL',
     "category": "Import-Export"}
+
+from bpy_extras.io_utils import (ExportHelper,
+                                 ImportHelper,
+                                 path_reference_mode,
+                                 axis_conversion,
+                                 )
+from bpy.props import (BoolProperty,
+                       FloatProperty,
+                       StringProperty,
+                       EnumProperty,
+                       CollectionProperty,
+                       )
+import bpy
 
 if "bpy" in locals():
     import imp
@@ -370,6 +372,12 @@ class ExportOgre(bpy.types.Operator, ExportHelper):
         default=False,
     )
 
+    renormalize_weights: BoolProperty(
+        name="Renormalize Weights",
+        description="Kenshi only supports 4 weights. IO_Contined exports the 4 highest weights and renormalizes them. Toggle off to disable renormalization.",
+        default=True,
+    )
+
     batch_export: BoolProperty(
         name="Batch Export",
         description="Export individual meshes as unique files based on blender object name",
@@ -427,6 +435,7 @@ class ExportOgre(bpy.types.Operator, ExportHelper):
         skeleton = layout.box()
         skeleton.prop(self, "export_skeleton")
         skeleton.prop(self, "export_animation")
+        skeleton.prop(self, "renormalize_weights")
 
         batch = layout.box()
         batch.prop(self, "batch_export")

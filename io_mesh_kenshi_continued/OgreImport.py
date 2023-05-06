@@ -1,4 +1,22 @@
-#!BPY
+# ##### BEGIN GPL LICENSE BLOCK #####
+#
+#  This program is free software; you can redistribute it and/or
+#  modify it under the terms of the GNU General Public License
+#  as published by the Free Software Foundation; either version 2
+#  of the License, or (at your option) any later version.
+#
+#  This program is distributed in the hope that it will be useful,
+#  but WITHOUT ANY WARRANTY; without even the implied warranty of
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#  GNU General Public License for more details.
+#
+#  You should have received a copy of the GNU General Public License
+#  along with this program; if not, write to the Free Software Foundation,
+#  Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
+#
+# ##### END GPL LICENSE BLOCK #####
+
+# <pep8-80 compliant>
 
 """
 Name: 'OGRE for Kenshi (*.MESH)'
@@ -15,18 +33,12 @@ and 'CCCenturion' for trying to refactor the code to be nicer (to be included)
 
 I took over this sometime in 2021 (Kindrad)
 
-last edited by Kindrad April 17 2023
+last edited by Kindrad May 6 2023
 """
 
-import subprocess
-import os
-import math
-from mathutils import Vector, Matrix
-import bpy
-import bmesh
-from xml.dom import minidom
 __author__ = "someone, Kindrad"
-__version__ = "2023/4/17"
+__version__ = "2023/5/6"
+
 __bpydoc__ = """\
 This script imports/exports Kenshi Ogre models into/from Blender.
 
@@ -47,6 +59,7 @@ Known issues:<br>
     * imported materials will lose certain informations not applicable to Blender when exported
 
 History:<br>
+    * v2023-5-6 (6-May-2023) - Now limits exports to 4 highest weights. Optional renormalization on export.
     * Aside: I Keep  forgetting to update here, read the github instead (kindrad)
     * v2023-4-17 (17-Apr-2023) - Added material importing
     * v2022-10-11 (11-Oct-2022) - Just putting it here, Updated to Blender 3.X+ API (Should work as far back as 2.8 though)
@@ -59,7 +72,7 @@ History:<br>
     * v0.8.11  (26-Feb-2019) - Fixed tangents and binormals for mirrorred uvs
     * v0.8.10  (32-Jan-2019) - Fixed export when mesh has multiple uv sets
     * v0.8.9   (08-Mar-2018) - Added import option to match weight maps and link with a previously imported skeleton
-    * v0.8.8   (26-Feb-2018) - Fixed export triangulation and custom normals
+    * v0.8.8   (26-feb-2018) - Fixed export triangulation and custom normals
     * v0.8.7   (01-Feb-2018) - Scene frame rate adjusted on import, Fixed quatenion normalisation
     * v0.8.6   (31-Jan-2018) - Fixed crash exporting animations in blender 2.79
     * v0.8.5   (02-Jan-2018) - Optimisation: Use hashmap for duplicate vertex detection
@@ -120,6 +133,14 @@ MESHDATA:
 Note: Bones store their OGREID as a custom variable so they are consistent when a mesh is exported
 
 """
+
+import subprocess
+import os
+import math
+from mathutils import Vector, Matrix
+import bpy
+import bmesh
+from xml.dom import minidom
 
 #from Blender import *
 
