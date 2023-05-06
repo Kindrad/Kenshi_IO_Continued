@@ -951,33 +951,33 @@ def bCollectMeshData(meshData, selectedObjects, export_params):
 
                 # vertex groups
                 boneWeights = {}
-                if len(mesh.vertices[vertex].groups) <= 4:
-                    #we have 4 or less bone weights, just dump all of them into mesh weights
+                if len(mesh.vertices[vertex].groups) <= 3:
+                    #we have 3 or less bone weights, just dump all of them into mesh weights
                     for vxGroup in mesh.vertices[vertex].groups:
                         vg = ob.vertex_groups[vxGroup.group]
                         boneWeights[vg.name] = vxGroup.weight
                 else:
-                    #We have more than 4 bone weights, Only take highest 4 weights
+                    #We have more than 3 bone weights, Only take highest 3 weights
                     weightList = mesh.vertices[vertex].groups.items()
 
                     tempWeights = []
-                    for i in range(4):
+                    for i in range(3):
                         tempWeights.append(weightList[i])
                     
                     minWeight = 0#index to smallest weight
 
                     #get smallest weight index
-                    for i in range(4):
+                    for i in range(3):
                         if tempWeights[i][1].weight < tempWeights[minWeight][1].weight:
                             minWeight = i
                     
                     #iterate through the weights, this should get us the smallest 4 weights in an arbitrary order
-                    for i in range(4, len(weightList)):
+                    for i in range(3, len(weightList)):
                         if weightList[i][1].weight > tempWeights[minWeight][1].weight:
                             tempWeights[minWeight] = weightList[i]
 
                             #get smallest weight again
-                            for i in range(4):
+                            for i in range(3):
                                 if tempWeights[i][1].weight < tempWeights[minWeight][1].weight:
                                     minWeight = i
 
