@@ -9,6 +9,7 @@ A fork of the Official Kenshi Blender IO addon. This fork has new features, nume
 + Added a Batch export option. When exporting multiple meshes you can optionally batch export them, they will be named according to the object name in Blender.
 + Added support for exporting alpha from main vertex color. (The older "alpha" secondary vertex color set still works)
 + Added different normal importing modes. Including edge-split recovery mode. Read tooltips for more details.
++ Added optional weight re-normalization on export. This is enabled by default.
 
 # Bugfixes compared to original:
 + Fixes bug when exporting multiple animations at once, animations no longer stack last frame of previous animation.
@@ -16,10 +17,11 @@ A fork of the Official Kenshi Blender IO addon. This fork has new features, nume
 + Fixed bug related to certain meshes failing to import vertex colors.
 + Fixes numerous crashes and bugs when using Blender versions 2.9 and later.
 + Fixes mesh collider export
++ Only exports highest 4 weight values. Not really a bug but Kenshi only supports 4 weights, this prevents weird errors vs old version.
 + I'm sure there are others and I can't remember what they were...
 
 # Known outstanding issues:
-+ There are still some bugs related to the export of colliders. Box and (non-convex) Mesh Colliders should work (these are the most important). Sphere, Capsule, and Convex Mesh Colliders are still problematic. As Box and Mesh are more important fixing these is low priority.
++ There are still some bugs related to the export of colliders. Box and (non-convex) Mesh Colliders should work (these are the most important). Sphere, Capsule, and Convex Mesh Colliders are still problematic. As Box and Mesh are more most important fixing these is low priority.
 
 # How to Install:
 
