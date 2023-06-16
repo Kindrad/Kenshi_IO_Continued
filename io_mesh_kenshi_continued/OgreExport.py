@@ -33,11 +33,11 @@ and 'CCCenturion' for trying to refactor the code to be nicer (to be included)
 
 I took over this sometime in 2021 (Kindrad)
 
-last edited by Kindrad May 6 2023
+last edited by Kindrad June 15 2013
 """
 
 __author__ = "someone, Kindrad"
-__version__ = "2023/5/6"
+__version__ = "2023/6/15"
 
 __bpydoc__ = """\
 This script imports/exports Kenshi Ogre models into/from Blender.
@@ -59,6 +59,7 @@ Known issues:<br>
     * imported materials will lose certain informations not applicable to Blender when exported
 
 History:<br>
+    * v2023-6-15 (15-June-2023) - When exporting skinned meshes with invalid vertex groups a warning is generated + fix.
     * v2023-5-6 (6-May-2023) - Now limits exports to 4 highest weights. Optional renormalization on export.
     * Aside: I Keep  forgetting to update here, read the github instead (kindrad)
     * v2023-4-17 (17-Apr-2023) - Added material importing
@@ -849,7 +850,7 @@ def luminosity(c):
     return c[0] * 0.25 + c[1] * 0.5 + c[2] * 0.25
 
 
-def bCollectMeshData(meshData, selectedObjects, export_params):
+def bCollectMeshData(operator, meshData, selectedObjects, export_params):
     import bmesh
     subMeshesData = []
     for ob in selectedObjects:
@@ -953,12 +954,31 @@ def bCollectMeshData(meshData, selectedObjects, export_params):
                 boneWeights = {}
                 if len(mesh.vertices[vertex].groups) <= 3:
                     #we have 3 or less bone weights, just dump all of them into mesh weights
-                    for vxGroup in mesh.vertices[vertex].groups:
-                        vg = ob.vertex_groups[vxGroup.group]
-                        boneWeights[vg.name] = vxGroup.weight
+                    
+                    weightList = mesh.vertices[vertex].groups.items()
+                    #iterate backwards through list and remove items not in the
+                    for wi in range(len(weightList) - 1 ,-1, -1):
+                        if weightList[wi][1].group > len(ob.vertex_groups) - 1:
+                            operator.report({'WARNING'} ,"vert: " + str(fidx) + " - has invalid vertex group: " + str(weightList[wi][1].group) + 
+                                            "!\n Continuing export without group. Vertex weights may not work as expected." +
+                                            "\n When transfering a mesh from one armature to another make sure to clear all vertex groups first.")
+                            weightList.pop(wi)
+
+                    for vxGroup in weightList:
+                        vg = ob.vertex_groups[vxGroup[1].group]
+                        boneWeights[vg.name] = vxGroup[1].weight
                 else:
                     #We have more than 3 bone weights, Only take highest 3 weights
                     weightList = mesh.vertices[vertex].groups.items()
+
+
+                    #iterate backwards through list and remove items not in the
+                    for wi in range(len(weightList) - 1 ,-1, -1):
+                        if weightList[wi][1].group > len(ob.vertex_groups) - 1:
+                            operator.report({'WARNING'} ,"vert: " + str(fidx) + " - has invalid vertex group: " + str(weightList[wi][1].group) + 
+                                            "!\n Continuing export without group. Vertex weights may not work as expected." +
+                                            "\n When transfering a mesh from one armature to another make sure to clear all vertex groups first.")
+                            weightList.pop(wi)
 
                     tempWeights = []
                     for i in range(3):
@@ -1256,7 +1276,7 @@ def save(operator, context, filepath,
         # skeleton
         bCollectSkeletonData(blenderMeshData, selectedObjects)
         # mesh
-        bCollectMeshData(blenderMeshData, selectedObjects, export_params)
+        bCollectMeshData(operator, blenderMeshData, selectedObjects, export_params)
         # materials
         if export_materials:
             bCollectMaterialData(blenderMeshData, selectedObjects)

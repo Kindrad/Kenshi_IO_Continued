@@ -33,11 +33,11 @@ and 'CCCenturion' for trying to refactor the code to be nicer (to be included)
 
 I took over this sometime in 2021 (Kindrad)
 
-last edited by Kindrad May 6 2023
+last edited by Kindrad June 15 2013
 """
 
 __author__ = "someone, Kindrad"
-__version__ = "2023/5/6"
+__version__ = "2023/6/15"
 
 __bpydoc__ = """\
 This script imports/exports Kenshi Ogre models into/from Blender.
@@ -59,6 +59,7 @@ Known issues:<br>
     * imported materials will lose certain informations not applicable to Blender when exported
 
 History:<br>
+    * v2023-6-15 (15-June-2023) - When exporting skinned meshes with invalid vertex groups a warning is generated + fix.
     * v2023-5-6 (6-May-2023) - Now limits exports to 4 highest weights. Optional renormalization on export.
     * Aside: I Keep  forgetting to update here, read the github instead (kindrad)
     * v2023-4-17 (17-Apr-2023) - Added material importing
