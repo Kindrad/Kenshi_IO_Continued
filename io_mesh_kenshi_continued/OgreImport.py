@@ -1123,7 +1123,7 @@ def bCreateSubMeshes(meshData, meshName, import_params):
             me.loops[i*3+1].vertex_index = faces[i][1]
             me.loops[i*3+2].vertex_index = faces[i][2]
             me.polygons[i].loop_start = i*3
-            me.polygons[i].loop_total = 3
+            #me.polygons[i].loop_total = 3
             if import_params['normal_mode'] != 'flat':
                 me.polygons[i].use_smooth = True
 
