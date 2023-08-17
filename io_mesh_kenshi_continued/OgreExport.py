@@ -297,34 +297,32 @@ def bCollectAnimationData(meshData):
         return
     armature = meshData['skeleton'].armature
     animdata = armature.animation_data
-    if animdata:
-        actions = []
-        # Current action
-        if animdata.action:
-            actions.append(animdata.action)
-        # actions in NLA
-        if animdata.nla_tracks:
-            for track in animdata.nla_tracks.values():
-                for strip in track.strips.values():
-                    if strip.action and strip.action not in actions:
-                        actions.append(strip.action)
 
+    if animdata:
         # Export them all
         scene = bpy.context.scene
         currentFrame = scene.frame_current
         currentAction = animdata.action
+        fps = scene.render.fps
+        frame_step = scene.frame_step
         meshData['animations'] = []
-        for act in actions:
-            print('Action', act.name)
-            animdata.action = act
-            animation = {}
-            animation['keyframes'] = collectAnimationData(
-                armature, act.frame_range, scene.render.fps, scene.frame_step)
-            animation['name'] = act.name
-            animation['length'] = (
-                act.frame_range[1] - act.frame_range[0]) / scene.render.fps
-            meshData['animations'].append(animation)
 
+        for track in animdata.nla_tracks.values():
+            for strip in track.strips.values():
+                if strip.action:
+                    print('Action', strip.action.name)
+                    action = strip.action
+                    animdata.action = action
+
+                    animation = {}
+                    animation['keyframes'] = collectAnimationData(
+                        armature, action.frame_range, fps, frame_step)
+                    animation['name'] = action.name
+                    animation['length'] = (
+                        action.frame_range[1] - action.frame_range[0]) / fps
+                    meshData['animations'].append(animation)
+
+        # Restore original action and frame
         animdata.action = currentAction
         scene.frame_set(currentFrame)
 
@@ -333,13 +331,9 @@ def collectAnimationData(armature, frame_range, fps, step=1):
     scene = bpy.context.scene
     start, end = frame_range
 
-    keyframes = {}
-    for bone in armature.pose.bones:
-        if bone.name.startswith("H_"):
-            continue
-        keyframes[bone.name] = [[], [], []]   # pos, rot, scl
+    keyframes = {bone.name: [[], [], []] for bone in armature.pose.bones if not bone.name.startswith("H_")} # pos, rot, scl
 
-    # swap YZ and negate some
+    # Swap YZ and negate some matrices
     fix1 = Matrix([(1, 0, 0), (0, 0, 1), (0, -1, 0)])
     fix2 = Matrix([(0, 1, 0), (0, 0, 1), (1, 0, 0)])
 
@@ -349,8 +343,8 @@ def collectAnimationData(armature, frame_range, fps, step=1):
     armature.hide_viewport = False
     prev = bpy.context.view_layer.objects.active
     bpy.context.view_layer.objects.active = armature
-    bpy.ops.object.mode_set(mode='OBJECT', toggle=False)
-    bpy.ops.object.mode_set(mode='EDIT', toggle=False)
+    bpy.ops.object.mode_set(mode='OBJECT')
+    bpy.ops.object.mode_set(mode='EDIT')
     for b in armature.data.edit_bones:
         if b.name.startswith("H_"):
             continue
@@ -358,32 +352,28 @@ def collectAnimationData(armature, frame_range, fps, step=1):
             mat[b.name] = fix2 @ b.parent.matrix.to_3x3().transposed() @ b.matrix.to_3x3()
         else:
             mat[b.name] = fix1 @  b.matrix.to_3x3()
-    bpy.ops.object.mode_set(mode='OBJECT', toggle=False)
+    bpy.ops.object.mode_set(mode='OBJECT')
     bpy.context.view_layer.objects.active = prev
     armature.hide_viewport = hidden
 
-    # Reset pose. Kludge to prevent animations overlaying each other when
-    # exporting multiple animations - Kindrad
+    # Reset pose
+    iQ = Quaternion((0, 0, 0), 1)
+    Scale = Vector((1, 1, 1))
     for poseBone in armature.pose.bones:
-        iQ = Quaternion((0, 0, 0), 1)
         poseBone.rotation_quaternion = iQ
-        poseBone.scale = Vector((1, 1, 1))
+        poseBone.scale = Scale
         poseBone.location = poseBone.bone.head
 
-    bpy.ops.object.mode_set(mode='OBJECT', toggle=False)
-
-    obj = bpy.ops.context.object
+    bpy.ops.object.mode_set(mode='OBJECT')
 
     # Collect data
-    # this steps through each frame and exports the location, rotation, and scale data
+    obj = bpy.context.object
     for frame in range(int(start), int(end)+1, step):
         time = (frame - start) / fps
         bpy.context.scene.frame_set(frame)
         for bone in armature.pose.bones:
-
             if bone.name.startswith("H_"):
                 continue
-
             loc, rot, scl = bone.matrix.decompose()
 
             pbMatrix = armature.convert_space(pose_bone=bone,
@@ -391,37 +381,12 @@ def collectAnimationData(armature, frame_range, fps, step=1):
                                               from_space='POSE',
                                               to_space='LOCAL')
 
-            loc, rot, scl = pbMatrix.decompose()  # dump scale since we keep original
-
-            # kludge fix, only support positive
-            # scl[0]
-            #scl[0] = -scl[0]
-
-            # transform transation into parent coordinates
+            loc, rot, scl = pbMatrix.decompose()
             loc = mat[bone.name] @ loc
 
             keyframes[bone.name][0].append((time, (loc[0], loc[1], loc[2])))
-            keyframes[bone.name][1].append(
-                (time, (rot[0], rot[1], rot[2], rot[3])))
+            keyframes[bone.name][1].append((time, (rot[0], rot[1], rot[2], rot[3])))
             keyframes[bone.name][2].append((time, (scl[0], scl[1], scl[2])))
-
-    # Remove unnessesary tracks
-    # identity = [ (0,0,0), (1,0,0,0), (1,1,1) ]
-    # for bone, data in keyframes.items():
-    #     for track in range(3):
-    #         used = False
-    #         for key in data[track]:
-    #             if used: break
-    #             for i in range(len(identity[track])):
-    #                 if abs(key[1][i] - identity[track][i]) > 1e-5:
-    #                     used = True
-    #                     break
-    #         if not used:
-    #             data[track] = []
-
-    #     # Delete whole track if unused
-    #     if not (data[0] or data[1] or data[2]):
-    #         keyframes[bone] = None
 
     return keyframes
 
@@ -1005,14 +970,15 @@ def bCollectMeshData(operator, meshData, selectedObjects, export_params):
                         vg = ob.vertex_groups[w[1].group]
                         boneWeights[vg.name] = w[1].weight
                     
-                #optional renormalize
-                if export_params["renormalize_weights"]:
-                    weightTotal = 0
-                    for bkey in boneWeights:
-                        weightTotal += boneWeights[bkey]
-                    
-                    for bkey in boneWeights:
-                        boneWeights[bkey] /= weightTotal
+                    # optional renormalize
+                    if export_params["renormalize_weights"]:
+                        weightTotal = 0
+                        for bkey in boneWeights:
+                            weightTotal += boneWeights[bkey]
+                        
+                        for bkey in boneWeights:
+                            if boneWeights[bkey] != 0:  # Skip if weight is 0
+                                boneWeights[bkey] /= weightTotal
 
 
                     
