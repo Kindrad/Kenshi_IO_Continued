@@ -24,20 +24,20 @@ Blender: 3.1+
 Group: 'Import/Export'
 Tooltip: 'Import/Export Kenshi OGRE mesh files'
 
-Author: someone, Kindrad
+Author: someone, Kindrad, samedog
 
 Based on the Torchlight Impost/Export script by 'Dusho'
 
 Also thanks to'goatman' for his port of Ogre export script from 2.49b to 2.5x,
 and 'CCCenturion' for trying to refactor the code to be nicer (to be included)
 
-I took over this sometime in 2021 (Kindrad)
+I took over this sometime in Sept 2021 (Kindrad)
 
-last edited by Kindrad June 15 2013
+last edited by Kindrad September 7th 2023
 """
 
-__author__ = "someone, Kindrad"
-__version__ = "2023/6/15"
+__author__ = "someone, Ssamedog, Kindrad"
+__version__ = "2023/9/7"
 
 __bpydoc__ = """\
 This script imports/exports Kenshi Ogre models into/from Blender.
@@ -59,6 +59,7 @@ Known issues:<br>
     * imported materials will lose certain informations not applicable to Blender when exported
 
 History:<br>
+    * v2023-9-7 (7-Sept-2023) - Added Linux support via Wine Wrapper + fixed some misc floating point rounding errors
     * v2023-6-15 (15-June-2023) - When exporting skinned meshes with invalid vertex groups a warning is generated + fix.
     * v2023-5-6 (6-May-2023) - Now limits exports to 4 highest weights. Optional renormalization on export.
     * Aside: I Keep  forgetting to update here, read the github instead (kindrad)
@@ -99,15 +100,15 @@ History:<br>
 
 bl_info = {
     "name": "Kenshi Tools (IO_Continued)",
-    "author": "someone, Kindrad",
+    "author": "someone, samedog, Kindrad",
     "blender": (3, 0, 0),
     "version": (2022, 6, 15),
     "location": "File > Import-Export",
-    "description": ("Import-Export Kenshi Model files, and export Kenshi collision files. (This is continued version by Kindrad)"),
+    "description": ("Import-Export Kenshi Model files, and export Kenshi collision files. (This is community version by Kindrad)"),
     "warning": "",
-    "wiki_url": "",
-    "tracker_url": "http://lofigames.com/phpBB3/",
-    "support": 'OFFICIAL',
+    "wiki_url": "https://github.com/Kindrad/Kenshi_IO_Continued",
+    "tracker_url": "https://github.com/Kindrad/Kenshi_IO_Continued",
+    "support": 'COMMUNITY',
     "category": "Import-Export"}
 
 import platform
