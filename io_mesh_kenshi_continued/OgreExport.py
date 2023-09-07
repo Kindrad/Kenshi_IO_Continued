@@ -206,29 +206,29 @@ class Skeleton(object):
         self.armature.hide_viewport = self.hidden
 
         # # Allocate bone ids
-        # index = 0
-        # missing = []
-        # self.bones = [None] * len(data.bones)
-        # #self.bones = []
-        # print("bones:", self.bones)
-        # for bone in data.bones:
-        #     if bone.name in self.ids:
-        #         print("bone name:", bone.name)
-        #         self.bones[self.ids[bone.name]] = bone
-        #     else:
-        #         missing.append(bone)
-        # for bone in missing:
-        #     while self.bones[index]:
-        #         index += 1
-        #     self.bones[index] = bone
-        #     self.ids[bone.name] = index
+        index = 0
+        missing = []
+        self.bones = [None] * len(data.bones)
+        #self.bones = []
+        print("bones:", self.bones)
+        for bone in data.bones:
+            if bone.name in self.ids:
+                print("bone name:", bone.name)
+                self.bones[self.ids[bone.name]] = bone
+            else:
+                missing.append(bone)
+        for bone in missing:
+            while self.bones[index]:
+                index += 1
+            self.bones[index] = bone
+            self.ids[bone.name] = index
 
         #Allocate bones and their IDS
-        index = 0
-        for bone in data.bones:
-            self.bones.append(bone)
-            self.ids[bone.name] = index
-            index += 1
+        # index = 0
+        # for bone in data.bones:
+        #     self.bones.append(bone)
+        #     self.ids[bone.name] = index
+        #     index += 1
 
         # calculate bone rest matrices
         # Rotate to y-up coordinates
