@@ -110,6 +110,8 @@ bl_info = {
     "support": 'OFFICIAL',
     "category": "Import-Export"}
 
+import platform
+
 from bpy_extras.io_utils import (ExportHelper,
                                  ImportHelper,
                                  path_reference_mode,
@@ -134,8 +136,11 @@ if "bpy" in locals():
 
 
 # Path for your OgreXmlConverter
-OGRE_XML_CONVERTER_Export = "OgreXMLConverter.exe"
-OGRE_XML_CONVERTER_Import = "ImportEXE\OgreXMLConverter.exe"
+OGRE_XML_CONVERTER = "OgreXMLConverter_1.12.9.exe"
+OGRE_XML_CONVERTER_Wine = "OgreXMLConverter_1.12.9_WINE.bash"
+
+OGRE_XML_CONVERTER_Experimental_1_10 = "1_10_Experimental/OgreXMLConverter_1.10.0.exe"
+OGRE_XML_CONVERTER_Experimental_1_10_Wine = "1_10_Experimental/OgreXMLConverter_1.10.0_WINE.bash"
 
 
 def findConverter(p):
@@ -163,6 +168,30 @@ class ImportOgre(bpy.types.Operator, ImportHelper):
     bl_options = {'PRESET'}
 
     filename_ext = ".mesh"
+
+
+    custom_xml_converter: StringProperty(
+        name="Custom XML Converter",
+        description="Ogre XML Converter program for converting between .MESH files and .XML files",
+        default= ""
+    )
+
+    xml_converter: EnumProperty(
+        items = [
+            ("default", "Default Ogre Converter (1.12.9)", "The default converter", 1),
+            ("compatibility (1.10)", "Compatibility Converter (1.10)", "Try this if the regular one doesn't work. (Scythe)", 2),
+            ("custom", "Custom XML Converter", "Use the xmlconvter specified in the custom field", 3)
+        ],
+        name = "XML Converter",
+        description = "The XML converter to use for converting between intermediate XML files and Ogre .mesh format.",
+        default = "default"
+    )
+
+    use_compatibility_xml: StringProperty(
+        name="XML Converter",
+        description="Ogre XML Converter program for converting between .MESH files and .XML files",
+        default= OGRE_XML_CONVERTER if platform.system() == "Windows" else OGRE_XML_CONVERTER_Wine
+    )
 
     files: CollectionProperty(
         type=bpy.types.OperatorFileListElement,
@@ -228,11 +257,6 @@ class ImportOgre(bpy.types.Operator, ImportHelper):
         options={'HIDDEN'},
     )
 
-    xml_converter: StringProperty(
-        name="XML Converter",
-        description="Ogre XML Converter program for converting between .MESH files and .XML files",
-        default=OGRE_XML_CONVERTER_Import
-    )
 
     def execute(self, context):
         # print("Selected: " + context.active_object.name)
@@ -240,25 +264,62 @@ class ImportOgre(bpy.types.Operator, ImportHelper):
         import os
 
         keywords = self.as_keywords(ignore=("filter_glob",))
-        keywords['xml_converter'] = findConverter(keywords['xml_converter'])
 
-        print('converter', keywords['xml_converter'])
+        #obtain converter
+        if platform.system == "Windows":
+            match keywords['xml_converter']:
+                case "default":
+                    keywords['xml_converter'] = findConverter(OGRE_XML_CONVERTER)
+                case "compatibility (1.10)":
+                    keywords['xml_converter'] = findConverter(OGRE_XML_CONVERTER_Experimental_1_10)
+                case "custom":
+                    keywords['xml_converter'] = findConverter(keywords['custom_xml_converter'])
+        else:
+            match keywords['xml_converter']:
+                case "default":
+                    keywords['xml_converter'] = findConverter(OGRE_XML_CONVERTER_Wine)
+                case "compatibility (1.10)":
+                    keywords['xml_converter'] = findConverter(OGRE_XML_CONVERTER_Experimental_1_10_Wine)
+                case "custom":
+                    keywords['xml_converter'] = findConverter(keywords['custom_xml_converter'])
+        
+
+        print('converter = ', keywords['xml_converter'])
+
 
         keywords.pop('files')
-
         directory = os.path.dirname(self.filepath)
+
+        #build import parameters dictionary
+        import_params = {
+            "filepath" : directory,
+            "xml_converter" : keywords['xml_converter'],
+            "keep_xml" : keywords['keep_xml'],
+            "import_normals" : keywords['import_normals'],
+            "normal_mode" : keywords['normal_mode'],
+            "import_shapekeys" : keywords['import_shapekeys'],
+            "import_animations" : keywords['import_animations'],
+            "round_frames" : keywords['round_frames'],
+            "use_selected_skeleton" : keywords['use_selected_skeleton'],
+            "import_materials" : keywords['import_materials']
+        }
+
+        print(import_params)
+
 
         bpy.context.window.cursor_set("WAIT")
         for meshpath in self.files:
-            keywords['filepath'] = directory + "\\" + meshpath.name
-            result = OgreImport.load(self, context, **keywords)
+            import_params['filepath'] = directory + "/" + meshpath.name
+            result = OgreImport.load(self, context, **import_params)
         #result = OgreImport.load(self, context, **keywords)
         bpy.context.window.cursor_set("DEFAULT")
         return result
 
     def draw(self, context):
+
         layout = self.layout
 
+        layout.prop(self, "custom_xml_converter")
         layout.prop(self, "xml_converter")
         layout.prop(self, "keep_xml")
         layout.prop(self, "import_normals")
@@ -290,10 +351,21 @@ class ExportOgre(bpy.types.Operator, ExportHelper):
 
     filename_ext = ".mesh"
 
-    xml_converter: StringProperty(
-        name="XML Converter",
+    custom_xml_converter: StringProperty(
+        name="Custom XML Converter",
         description="Ogre XML Converter program for converting between .MESH files and .XML files",
-        default=OGRE_XML_CONVERTER_Export,
+        default= ""
+    )
+
+    xml_converter: EnumProperty(
+        items = [
+            ("default", "Default Ogre Converter (1.12.9)", "The default converter", 1),
+            ("compatibility (1.10)", "Compatibility Converter (1.10)", "Try this if the regular one doesn't work. (Scythe)", 2),
+            ("custom", "Custom XML Converter", "Use the xmlconvter specified in the custom field", 3)
+        ],
+        name = "XML Converter",
+        description = "The XML converter to use for converting between intermediate XML files and Ogre .mesh format.",
+        default = "default"
     )
 
     export_tangents: BoolProperty(
@@ -404,10 +476,51 @@ class ExportOgre(bpy.types.Operator, ExportHelper):
         print("Exporting using github version")
 
         keywords = self.as_keywords(ignore=("check_existing", "filter_glob"))
-        keywords['xml_converter'] = findConverter(keywords['xml_converter'])
+        
+        #obtain converter
+        if platform.system == "Windows":
+            match keywords['xml_converter']:
+                case "default":
+                    keywords['xml_converter'] = findConverter(OGRE_XML_CONVERTER)
+                case "compatibility (1.10)":
+                    keywords['xml_converter'] = findConverter(OGRE_XML_CONVERTER_Experimental_1_10)
+                case "custom":
+                    keywords['xml_converter'] = findConverter(keywords['custom_xml_converter'])
+        else:
+            match keywords['xml_converter']:
+                case "default":
+                    keywords['xml_converter'] = findConverter(OGRE_XML_CONVERTER_Wine)
+                case "compatibility (1.10)":
+                    keywords['xml_converter'] = findConverter(OGRE_XML_CONVERTER_Experimental_1_10_Wine)
+                case "custom":
+                    keywords['xml_converter'] = findConverter(keywords['custom_xml_converter'])
+        
+
+        print('converter = ', keywords['xml_converter'])
+
+        #build parameter dicionary
+        export_params = {
+            "filepath" : keywords['filepath'],
+            "xml_converter" : keywords['xml_converter'],
+            "keep_xml" : keywords['keep_xml'],
+            "export_tangents" : keywords['export_tangents'],
+            "export_binormals" : keywords['export_binormals'],
+            "export_colour" : keywords['export_colour'],
+            "tangent_parity" : keywords['tangent_parity'],
+            "apply_transform" : keywords['apply_transform'],
+            "apply_modifiers" : keywords['apply_modifiers'],
+            "export_materials" : keywords['export_materials'],
+            "overwrite_material" : keywords['overwrite_material'],
+            "copy_textures" : keywords['copy_textures'],
+            "export_skeleton" : keywords['export_skeleton'],
+            "export_poses" : keywords['export_poses'],
+            "export_animation" : keywords['export_animation'],
+            "renormalize_weights": keywords['renormalize_weights'],
+            "batch_export" : keywords['batch_export']
+        }
 
         bpy.context.window.cursor_set("WAIT")
-        result = OgreExport.save(self, context, **keywords)
+        result = OgreExport.save(self, context, **export_params)
         bpy.context.window.cursor_set("DEFAULT")
         return result
 
@@ -415,6 +528,7 @@ class ExportOgre(bpy.types.Operator, ExportHelper):
         layout = self.layout
 
         xml = layout.box()
+        xml.prop(self, "custom_xml_converter")
         xml.prop(self, "xml_converter")
         xml.prop(self, "keep_xml")
 

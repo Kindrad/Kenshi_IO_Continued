@@ -155,6 +155,8 @@ blender_version = 259
 # also keeps after name (as Torchlight uses names to identify types -boots, chest, ...- with names)
 # TODO: this is not needed for Blender 2.62 and above
 
+rounding_epsilon = 1e-3
+
 
 def GetValidBlenderName(name):
 
@@ -536,7 +538,7 @@ def calcZeroBones(BonesData):
     zeroBones = {}
     for bone in BonesData.keys():
         pos = BonesData[bone]['position']
-        if (math.sqrt(pos[0]**2+pos[1]**2+pos[2]**2)) == 0:
+        if (math.isclose(math.sqrt(pos[0]**2+pos[1]**2+pos[2]**2), 0.0, abs_tol = rounding_epsilon)):#prevent rounding errors
             ZeroBone = {}
             ZeroBone['position'] = [0.2, 0.0, 0.0]
             ZeroBone['rotation'] = [1.0, 0.0, 0.0, 0.0]
@@ -900,7 +902,7 @@ def bCreateSkeleton(meshData, name):
         childLength = b['position'][0]
         averageBone += childLength
     averageBone /= len(bonesData)
-    if averageBone == 0:
+    if math.isclose(averageBone, 0.0, abs_tol=rounding_epsilon):#prevent rounding errors
         averageBone = 0.2
     print("Default bone length:", averageBone)
 
@@ -915,7 +917,7 @@ def bCreateSkeleton(meshData, name):
         # Store Ogre bone id to match when expotring
         if 'id' in boneData:
             boneObj['OGREID'] = boneData['id']
-            print('bone', boneData['id'], boneName)
+            print('Bone imported from XML:', boneData['id'], boneName)
 
         #boneObj.head = boneData['posHAS']
         #headPos = boneData['posHAS']
@@ -924,7 +926,7 @@ def bCreateSkeleton(meshData, name):
         if len(children) > 0:
             for child in children:
                 tailVector = max(tailVector, bonesData[child]['position'][0])
-        if tailVector == 0:
+        if math.isclose(tailVector, 0.0, abs_tol=rounding_epsilon):#prevent rounding errors
             tailVector = averageBone
 
         #boneObj.head = Vector([headPos[0],-headPos[2],headPos[1]])
@@ -969,6 +971,7 @@ def bCreateSkeleton(meshData, name):
         boneObj.tail = Vector([0, tailVector, 0])
         #matx = Matrix.Translation(Vector([headPos[0],-headPos[2],headPos[1]]))
 
+
         boneObj.transform(boneRotMatrix)
         # bpy.context.view_layer.update()
         boneObj.translate(Vector([headPos[0], -headPos[2], headPos[1]]))
@@ -976,6 +979,8 @@ def bCreateSkeleton(meshData, name):
         # boneObj.translate(Vector([headPos[0],-headPos[2],headPos[1]]))
         #boneObj.head = Vector([headPos[0],-headPos[2],headPos[1]])
         #boneObj.tail = Vector([headPos[0],-headPos[2],headPos[1]]) + (Vector([0,0, tailVector])  * Matrix((r1,r0,r2)))
+
+        #print(boneObj.name,"bonehead", boneObj.head, "bonetail", boneObj.tail)
 
         #amt.bones[bone] = boneObj
         # amt.update_tag(refresh)
@@ -992,9 +997,11 @@ def bCreateSkeleton(meshData, name):
             boneObj = amt.edit_bones[boneName]
             boneObj.parent = amt.edit_bones[parent]
 
+
     # need to refresh armature before removing bones
     bpy.ops.object.mode_set(mode='OBJECT')
     bpy.ops.object.mode_set(mode='EDIT')
+
 
     # delete helper/zero bones
     for bone in amt.bones.keys():
@@ -1373,9 +1380,9 @@ def convertXML(convertor, filename, use_existing=True):
     elif convertor is None:
         return False
     else:
-        print("Execute: ", convertor, '-q', filename)
+        print("Execute: ", convertor, filename)
         try:
-            subprocess.call([convertor, '-q', filename])
+            subprocess.call([convertor, filename])
             return os.path.isfile(filename + '.xml')
         except:
             print("Error: Could not run", convertor)

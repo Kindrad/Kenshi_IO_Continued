@@ -113,6 +113,7 @@ SHOW_EXPORT_TRACE_VX = False
 # default blender version of script
 blender_version = 259
 
+rounding_epsilon = 1e-3
 
 def hash_combine(x, y):
     return x ^ y + 0x9e3779b9 + (x << 6) + (x >> 2)
@@ -181,6 +182,7 @@ class Skeleton(object):
     def __init__(self, ob):
         self.armature = ob.find_armature()
         self.name = self.armature.name
+        self.bones = []
         self.ids = {}
         self.hidden = self.armature.hide_viewport
         data = self.armature.data
@@ -202,21 +204,30 @@ class Skeleton(object):
         bpy.context.view_layer.objects.active = prev
         self.armature.hide_viewport = self.hidden
 
-        # Allocate bone ids
+        # # Allocate bone ids
+        # index = 0
+        # missing = []
+        # self.bones = [None] * len(data.bones)
+        # #self.bones = []
+        # print("bones:", self.bones)
+        # for bone in data.bones:
+        #     if bone.name in self.ids:
+        #         print("bone name:", bone.name)
+        #         self.bones[self.ids[bone.name]] = bone
+        #     else:
+        #         missing.append(bone)
+        # for bone in missing:
+        #     while self.bones[index]:
+        #         index += 1
+        #     self.bones[index] = bone
+        #     self.ids[bone.name] = index
+
+        #Allocate bones and their IDS
         index = 0
-        missing = []
-        self.bones = [None] * len(data.bones)
-        #self.bones = []
         for bone in data.bones:
-            if bone.name in self.ids:
-                self.bones[self.ids[bone.name]] = bone
-            else:
-                missing.append(bone)
-        for bone in missing:
-            while self.bones[index]:
-                index += 1
-            self.bones[index] = bone
+            self.bones.append(bone)
             self.ids[bone.name] = index
+            index += 1
 
         # calculate bone rest matrices
         # Rotate to y-up coordinates
@@ -436,7 +447,11 @@ def xSaveAnimation(animation, xDoc, xAnimations):
                 rot = data[1][frame][1]
                 angle = math.acos(rot[0]) * 2
                 l = math.sqrt(rot[1]*rot[1] + rot[2]*rot[2] + rot[3]*rot[3])
-                axis = (1, 0, 0) if l == 0 else (rot[1]/l, rot[2]/l, rot[3]/l)
+                
+                if math.isclose(l, 0.0, abs_tol=rounding_epsilon):#prevent rounding errors
+                    axis = (1, 0, 0)
+                else:
+                    (rot[1]/l, rot[2]/l, rot[3]/l)
 
                 rotate = xDoc.createElement('rotate')
                 raxis = xDoc.createElement('axis')

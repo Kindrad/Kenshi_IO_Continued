@@ -1,0 +1,29 @@
+21:14:37: Creating resource group General
+21:14:37: Creating resource group OgreInternal
+21:14:37: Creating resource group OgreAutodetect
+21:14:37: Registering ResourceManager for type Mesh
+21:14:37: Registering ResourceManager for type Material
+21:14:37: Registering ResourceManager for type Skeleton
+21:14:37: Skeleton: Loading ivturr.skeleton
+21:14:37: Error: Unable to load skeleton 'ivturr.skeleton' for Mesh 'conversion'. This Mesh will not be animated. You can ignore this message if you are using an offline tool.
+21:14:37: XMLMeshSerializer writing mesh data to /home/kay/Downloads/ivturr.mesh.xml...
+21:14:37: Populating DOM...
+21:14:37: Writing submesh...
+21:14:37: Exporting dedicated geometry bone assignments...
+21:14:37: Dedicated geometry bone assignments exported.
+21:14:37: Submesh exported.
+21:14:37: Writing submesh...
+21:14:37: Exporting dedicated geometry bone assignments...
+21:14:37: Dedicated geometry bone assignments exported.
+21:14:37: Submesh exported.
+21:14:37: Writing submesh...
+21:14:37: Exporting dedicated geometry bone assignments...
+21:14:37: Dedicated geometry bone assignments exported.
+21:14:37: Submesh exported.
+21:14:37: Exporting skeleton link...
+21:14:37: Skeleton link exported.
+21:14:37: DOM populated, writing XML file..
+21:14:37: XMLMeshSerializer export successful.
+21:14:37: Unregistering ResourceManager for type Skeleton
+21:14:37: Unregistering ResourceManager for type Material
+21:14:37: Unregistering ResourceManager for type Mesh
