@@ -267,7 +267,7 @@ class ImportOgre(bpy.types.Operator, ImportHelper):
         keywords = self.as_keywords(ignore=("filter_glob",))
 
         #obtain converter
-        if platform.system == "Windows":
+        if platform.system() == "Windows":
             match keywords['xml_converter']:
                 case "default":
                     keywords['xml_converter'] = findConverter(OGRE_XML_CONVERTER)
@@ -275,7 +275,7 @@ class ImportOgre(bpy.types.Operator, ImportHelper):
                     keywords['xml_converter'] = findConverter(OGRE_XML_CONVERTER_Experimental_1_10)
                 case "custom":
                     keywords['xml_converter'] = findConverter(keywords['custom_xml_converter'])
-        else:
+        elif platform.system() == "Linux":
             match keywords['xml_converter']:
                 case "default":
                     keywords['xml_converter'] = findConverter(OGRE_XML_CONVERTER_Wine)
@@ -479,7 +479,7 @@ class ExportOgre(bpy.types.Operator, ExportHelper):
         keywords = self.as_keywords(ignore=("check_existing", "filter_glob"))
         
         #obtain converter
-        if platform.system == "Windows":
+        if platform.system() == "Windows":
             match keywords['xml_converter']:
                 case "default":
                     keywords['xml_converter'] = findConverter(OGRE_XML_CONVERTER)
@@ -487,7 +487,7 @@ class ExportOgre(bpy.types.Operator, ExportHelper):
                     keywords['xml_converter'] = findConverter(OGRE_XML_CONVERTER_Experimental_1_10)
                 case "custom":
                     keywords['xml_converter'] = findConverter(keywords['custom_xml_converter'])
-        else:
+        elif platform.system() == "Linux":
             match keywords['xml_converter']:
                 case "default":
                     keywords['xml_converter'] = findConverter(OGRE_XML_CONVERTER_Wine)
