@@ -137,11 +137,11 @@ if "bpy" in locals():
 
 
 # Path for your OgreXmlConverter
-OGRE_XML_CONVERTER = "OgreXMLConverter_1.12.9.exe"
-OGRE_XML_CONVERTER_Wine = "OgreXMLConverter_1.12.9_WINE.bash"
+OGRE_XML_CONVERTER_1_29 = "XML_1_29/OgreXMLConverter.exe"
+OGRE_XML_CONVERTER_1_29_Wine = "XML_1_29/OgreXMLConverter.bash"
 
-OGRE_XML_CONVERTER_Experimental_1_10 = "1_10_Experimental/OgreXMLConverter_1.10.0_experimental.exe"
-OGRE_XML_CONVERTER_Experimental_1_10_Wine = "1_10_Experimental/OgreXMLConverter_1.10.0_WINE.bash"
+OGRE_XML_CONVERTER_1_10 = "XML_1_10/OgreXMLConverter.exe"
+OGRE_XML_CONVERTER_1_10_Wine = "XML_1_10/OgreXMLConverter.bash"
 
 
 def findConverter(p):
@@ -191,7 +191,7 @@ class ImportOgre(bpy.types.Operator, ImportHelper):
     use_compatibility_xml: StringProperty(
         name="XML Converter",
         description="Ogre XML Converter program for converting between .MESH files and .XML files",
-        default= OGRE_XML_CONVERTER if platform.system() == "Windows" else OGRE_XML_CONVERTER_Wine
+        default= OGRE_XML_CONVERTER_1_29 if platform.system() == "Windows" else OGRE_XML_CONVERTER_1_29_Wine
     )
 
     files: CollectionProperty(
@@ -270,17 +270,17 @@ class ImportOgre(bpy.types.Operator, ImportHelper):
         if platform.system() == "Windows":
             match keywords['xml_converter']:
                 case "default":
-                    keywords['xml_converter'] = findConverter(OGRE_XML_CONVERTER)
+                    keywords['xml_converter'] = findConverter(OGRE_XML_CONVERTER_1_29)
                 case "compatibility (1.10)":
-                    keywords['xml_converter'] = findConverter(OGRE_XML_CONVERTER_Experimental_1_10)
+                    keywords['xml_converter'] = findConverter(OGRE_XML_CONVERTER_1_10)
                 case "custom":
                     keywords['xml_converter'] = findConverter(keywords['custom_xml_converter'])
         elif platform.system() == "Linux":
             match keywords['xml_converter']:
                 case "default":
-                    keywords['xml_converter'] = findConverter(OGRE_XML_CONVERTER_Wine)
+                    keywords['xml_converter'] = findConverter(OGRE_XML_CONVERTER_1_29_Wine)
                 case "compatibility (1.10)":
-                    keywords['xml_converter'] = findConverter(OGRE_XML_CONVERTER_Experimental_1_10_Wine)
+                    keywords['xml_converter'] = findConverter(OGRE_XML_CONVERTER_1_10_Wine)
                 case "custom":
                     keywords['xml_converter'] = findConverter(keywords['custom_xml_converter'])
         
@@ -482,17 +482,17 @@ class ExportOgre(bpy.types.Operator, ExportHelper):
         if platform.system() == "Windows":
             match keywords['xml_converter']:
                 case "default":
-                    keywords['xml_converter'] = findConverter(OGRE_XML_CONVERTER)
+                    keywords['xml_converter'] = findConverter(OGRE_XML_CONVERTER_1_29)
                 case "compatibility (1.10)":
-                    keywords['xml_converter'] = findConverter(OGRE_XML_CONVERTER_Experimental_1_10)
+                    keywords['xml_converter'] = findConverter(OGRE_XML_CONVERTER_1_10)
                 case "custom":
                     keywords['xml_converter'] = findConverter(keywords['custom_xml_converter'])
         elif platform.system() == "Linux":
             match keywords['xml_converter']:
                 case "default":
-                    keywords['xml_converter'] = findConverter(OGRE_XML_CONVERTER_Wine)
+                    keywords['xml_converter'] = findConverter(OGRE_XML_CONVERTER_1_29_Wine)
                 case "compatibility (1.10)":
-                    keywords['xml_converter'] = findConverter(OGRE_XML_CONVERTER_Experimental_1_10_Wine)
+                    keywords['xml_converter'] = findConverter(OGRE_XML_CONVERTER_1_10_Wine)
                 case "custom":
                     keywords['xml_converter'] = findConverter(keywords['custom_xml_converter'])
         
