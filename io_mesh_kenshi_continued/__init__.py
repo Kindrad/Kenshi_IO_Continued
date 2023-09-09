@@ -140,7 +140,7 @@ if "bpy" in locals():
 OGRE_XML_CONVERTER = "OgreXMLConverter_1.12.9.exe"
 OGRE_XML_CONVERTER_Wine = "OgreXMLConverter_1.12.9_WINE.bash"
 
-OGRE_XML_CONVERTER_Experimental_1_10 = "1_10_Experimental/OgreXMLConverter_1.10.0.exe"
+OGRE_XML_CONVERTER_Experimental_1_10 = "1_10_Experimental/OgreXMLConverter_1.10.0_experimental.exe"
 OGRE_XML_CONVERTER_Experimental_1_10_Wine = "1_10_Experimental/OgreXMLConverter_1.10.0_WINE.bash"
 
 

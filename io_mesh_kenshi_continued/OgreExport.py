@@ -1163,17 +1163,26 @@ def XMLtoOGREConvert(blenderMeshData, filepath, ogreXMLconverter,
         xmlFilepath = filepath + ".xml"
         subprocess.call([ogreXMLconverter, xmlFilepath])
         # remove XML file if successfully converted
-        if keep_xml is False and os.path.isfile(filepath):
+        if keep_xml is False and os.path.isfile(xmlFilepath):
             os.unlink("%s" % xmlFilepath)
+            if not os.path.isfile(filepath):#return false if the .mesh file wasn't generated
+                print("Could not find .mesh: ", filepath)
+                return False
+        else:
+            return False
 
         if 'skeleton' in blenderMeshData and export_skeleton:
             # for skeleton
             skelFile = os.path.splitext(filepath)[0]  # removing .mesh
-            xmlFilepath = skelFile + ".skeleton.xml"
+            skelFile = skelFile + ".skeleton"
+            xmlFilepath = skelFile + ".xml"
             subprocess.call([ogreXMLconverter, xmlFilepath])
             # remove XML file
-            if keep_xml is False:
+            if keep_xml is False and os.path.isfile(xmlFilepath):
                 os.unlink("%s" % xmlFilepath)
+                if not os.path.isfile(skelFile):#return false if the .skeleton file wasn't generated
+                    print("Could not find .skeleton: ", skelFile)
+                    return False
 
         return True
 
