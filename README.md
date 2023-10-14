@@ -25,33 +25,21 @@ A fork of the Official Kenshi Blender IO addon. This fork has new features, nume
 
 # How to Install:
 
-## DO NOT USE THE ADDON INSTALL FUNCTION THROUGH BLENDER, MANUALLY INSTALL INSTEAD USING INSTRUCTIONS BELOW
-
 ### Simple Install:
 
-1. Download.
+1. Download as Zip.
 <img src="https://github.com/Kindrad/Kenshi_IO_Continued/blob/main/install_instructions/Step_1.png" height="200"/>
 
-2. Add the "io_mesh_kenshi_continued" from the zip folder to your Blender addons folder.
-
-The folder structure should look like this: "C:\Users[username]\AppData\Roaming\Blender Foundation\Blender\3.X\scripts\addons\io_mesh_kenshi_continued"
-#### Or if using Blender 2.8:
-The folder structure should look like this: "C:\[Path to Blender install directory]\Blender\2.8X\scripts\addons\io_mesh_kenshi_continued" 
-
-<img src="https://github.com/Kindrad/Kenshi_IO_Continued/blob/main/install_instructions/Step_2.png" height="200"/>
-
-3. Enable addon in the Blender addons.
-<img src="https://github.com/Kindrad/Kenshi_IO_Continued/blob/main/install_instructions/Step_3a.png" height="200"/>
-<img src="https://github.com/Kindrad/Kenshi_IO_Continued/blob/main/install_instructions/Step_3b.png" height="200"/>
+2. Install Addon: Blender -> Edit -> Preferences -> Addons -> Install -> Select Downloaded Zip -> Enable Addon
+<img src="https://github.com/Kindrad/Kenshi_IO_Continued/blob/main/install_instructions/Step_3a.png" height="200"/> <img src="https://github.com/Kindrad/Kenshi_IO_Continued/blob/main/install_instructions/Step_3b.png" height="200"/>
 
 ### or
 
 ### With Github:
 
-This will update the addon regularly. I assume you probably don't need pictures if you are doing this.
+This will update the addon to latest (possibly indevelopment) version. I assume you probably don't need pictures if you are doing this.
 
 1. Clone locally
 2. Add a symlink from your Blender addon folder to the "io_mesh_kenshi_continued" folder at your local git location.
-The symlink file structure should look like this: "C:\Users[username]\AppData\Roaming\Blender Foundation\Blender\3.X\scripts\addons\io_mesh_kenshi_continued"
 3. Enable addon in the Blender addons.
 
