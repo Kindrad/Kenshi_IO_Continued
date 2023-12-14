@@ -2,7 +2,7 @@
 A fork of the Official Kenshi Blender IO addon. This fork has new features, numerous bugfixes, and quality of life changes. This addon also supports Blender 3.0 and forward, it can work with Blender 2.8 and older.
 
 # New Features:
-+ Works on Blender 3.0+. It should work as far back as 2.8 though
++ Works on Blender 3.3+ (Older versions use an outdated version of Python)
 + Meshes with skeleton can be exported to Scythe. (Thank you @boasz for figuring this out)
 + Adding "H_" to the name of a bone prevents it from being exported, use this if you want helper bones (ie: IK targets) in the skeleton.
 + Added ability to import multiple files at once. To facilitate this imported objects are named after the filename as opposed to material name (which was usually 'default')
@@ -17,6 +17,7 @@ A fork of the Official Kenshi Blender IO addon. This fork has new features, nume
 + Fixed bug related to certain meshes failing to import vertex colors.
 + Fixes numerous crashes and bugs when using Blender versions 2.9 and later.
 + Fixes mesh collider export
++ Vertex Alpha now actually imports.
 + Only exports highest 3 weight values. Not really a bug but Kenshi only supports 3 weights, this prevents weird errors vs old version.
 + I'm sure there are others and I can't remember what they were...
 
