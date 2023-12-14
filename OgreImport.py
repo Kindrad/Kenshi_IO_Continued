@@ -1208,27 +1208,31 @@ def bCreateSubMeshes(meshData, meshName, import_params):
                         uvData[loopIndex].uv = uvsets[v][j]
                         loopIndex += 1
 
-            # vertex colors
-            if 'vertexcolors' in geometry:
-                colourData = me.vertex_colors.new(name='Colour'+str(j)).data
-                vcolors = geometry['vertexcolors']
-                loopIndex = 0
-                for face in faces:
-                    for v in face:
-                        colourData[loopIndex].color = vcolors[v]
-                        loopIndex += 1
+        # vertex colors
+        if 'vertexcolors' in geometry:
+            colourData = me.vertex_colors.new(name='Colour'+str(j)).data
+            vcolors = geometry['vertexcolors']
+            loopIndex = 0
+            for face in faces:
+                for v in face:
+                    colourData[loopIndex].color = vcolors[v]
+                    loopIndex += 1
 
-                # Vertex Alpha
-                for c in vcolors:
-                    if c[3] != 1.0:
-                        alphaData = me.vertex_colors.new(
-                            name='Alpha'+str(j)).data
-                        loopIndex = 0
-                        for face in faces:
-                            for v in face:
-                                colourData[loopIndex].color[3] = vcolors[v][3]
-                                loopIndex += 1
-                        break
+            # Vertex Alpha
+            for c in vcolors:
+                if c[3] != 1.0:
+                    alphaData = me.vertex_colors.new(name='Alpha'+str(j)).data
+                    loopIndex = 0
+                    for face in faces:
+                        for v in face:
+                            colourData[loopIndex].color[3] = vcolors[v][3]
+
+                            alphaData[loopIndex].color[0] = vcolors[v][3]
+                            alphaData[loopIndex].color[1] = vcolors[v][3]
+                            alphaData[loopIndex].color[2] = vcolors[v][3]
+                            alphaData[loopIndex].color[3] = vcolors[v][3]
+                            loopIndex += 1
+                    break
 
         # bone assignments:
         if 'boneIDs' in meshData:
