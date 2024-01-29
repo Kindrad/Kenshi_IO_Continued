@@ -2,7 +2,7 @@
 
 # !!!Note!!!
 
-The addon is moving and can now be found at:
+The addon has moved and can now be found at:
 https://codeberg.org/Kindrad/Kenshi_IO_Continued
 
 -----
