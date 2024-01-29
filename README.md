@@ -1,5 +1,13 @@
 # Kenshi_IO_Continued
+
+
 A fork of the Official Kenshi Blender IO addon. This fork has new features, numerous bugfixes, and quality of life changes. This addon also supports Blender 3.0 and forward, it can work with Blender 2.8 and older.
+
+
+# Note!!!:
+
+The addon is moving and can now be found at:
+https://codeberg.org/Kindrad/Kenshi_IO_Continued
 
 # New Features:
 + Works on Blender 3.3+ (Older versions use an outdated version of Python)
